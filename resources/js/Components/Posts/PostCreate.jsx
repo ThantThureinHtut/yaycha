@@ -1,0 +1,268 @@
+import {
+    InputGroup,
+    InputGroupAddon,
+    InputGroupButton,
+    InputGroupInput,
+    InputGroupText,
+    InputGroupTextarea,
+} from "@/components/ui/input-group";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Link, useForm, usePage } from "@inertiajs/react";
+import {
+    ArrowUpIcon,
+    Search,
+    FilePlus,
+    Earth,
+    Brain,
+    X,
+    TriangleAlert,
+    BadgeCheck,
+    AlertCircleIcon,
+} from "lucide-react";
+import { Avatar } from "@/components/ui/avatar";
+import { AvatarImage } from "@/components/ui/avatar";
+import { useEffect, useState } from "react";
+import { Button } from "../ui/button";
+import { Separator } from "../ui/separator";
+import { Badge } from "../ui/badge";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import NProgress from "nprogress"; // Import the library
+import "nprogress/nprogress.css"; // Import the CSS
+import axios from "axios";
+import { useTheme } from "@/src/Context/ThemeContext";
+
+export default function PostCreate() {
+    const { auth } = usePage().props;
+    const { setAi, setOpen } = useTheme();
+    const [isMobile, setMobile] = useState(false);
+    const blueMarkCheck = auth.user?.bluemark === 1;
+    const { data, setData, errors,setError, post, prcessing, isPending } = useForm({
+        title: "",
+        body: "",
+    });
+
+    //This is use for resize and depend on the page size
+    useEffect(() => {
+        const checkSize = () => {
+            setMobile(window.innerWidth < 768);
+        };
+        checkSize();
+
+        window.addEventListener("resize", checkSize);
+
+        // need to run  when components is unmounted , it will clear your effect.
+        // to optain the preformace
+        return () => window.removeEventListener("resize", checkSize);
+    }, []);
+
+    const [isAiErrorMessage, setAiErrorMessage] = useState("");
+    // Fetch the Ai Generate Title from the backend
+    const aiMutation = useMutation({
+        mutationFn: async (bodyText) => {
+            const response = await axios.post(route("post.generate-title"), {
+                body: bodyText,
+            });
+            return response.data;
+        },
+        onSuccess: (e) => {
+            NProgress.done();
+            setAi(false);
+            setData("title", e.title);
+        },
+        onError: (e) => {
+            console.log(e);
+        },
+    });
+
+    // AI Auto Title Generate Submit
+    const handleAutoGenerate = async () => {
+        if (!data.body || data.body.length < 5) {
+            setAiErrorMessage("Please write content first!");
+            return;
+        }
+        NProgress.configure({ showSpinner: false });
+        NProgress.start();
+        try {
+            aiMutation.mutate(data.body);
+            setAi(true);
+            setAiErrorMessage("");
+            setError('body' , '')
+            setData("title", "Title is generating");
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    // Create the Post Submit
+    const createPostHandler = (e) => {
+        e.preventDefault();
+        post(route("post.create"));
+        if (!isMobile) {
+            setOpen(false);
+        }
+    };
+    return (
+        <form
+            onSubmit={createPostHandler}
+            className={`sm:max-w-xl flex items-center gap-2 ${
+                aiMutation.isPending ? "[&>button]:hidden cursor-wait" : ""
+            }`}
+        >
+            <div className="grid flex-1 gap-2">
+                {/* Post User Image and Name */}
+                <div className="flex justify-between">
+                    <div className="flex items-center gap-3 mb-2">
+                        <Avatar>
+                            <AvatarImage src={auth.user?.avatar_url} />
+                        </Avatar>
+                        <div>
+                            <h1 className=" font-bold">
+                                {auth.user?.username}
+                            </h1>
+                            <Badge className="gap-1 mt-1">
+                                <Earth size={15} />
+                                <span>public</span>
+                            </Badge>
+                        </div>
+                    </div>
+                    <Button
+                        type="submit"
+                        disabled={aiMutation.isPending || (data.body && data.title ? false : true)}
+                        className={isMobile ? "" : "hidden"}
+                    >
+                        Post
+                    </Button>
+                </div>
+
+                {/* This Show the Error Message of Ai gen request */}
+                <div className="text-red-500">{isAiErrorMessage}</div>
+
+                    {
+                        (!errors.title && !errors.body) || (errors.title || errors.body) && (
+                            <Alert variant="destructive">
+                        <AlertCircleIcon />
+                        <AlertTitle>Unable to process Data.</AlertTitle>
+                        <AlertDescription>
+                            <ul className="list-inside list-disc text-sm">
+                                <li className={errors.title ? '' : 'hidden'}>{errors.title}</li>
+                                <li className={errors.body ? '' : 'hidden'}>{errors.body}</li>
+                            </ul>
+                        </AlertDescription>
+                    </Alert>
+                        )
+                    }
+
+
+                <InputGroup>
+                    <InputGroupInput
+                        value={data.title}
+                        onChange={(e) => setData("title", e.target.value)}
+                        placeholder="Title"
+                        disabled={aiMutation.isPending}
+                    />
+
+                    {/* This is check for bluemark
+                        If user is don't have the bluemark , can't access to use the AI Gen
+                        The user must have the bluemark to use it
+                                    */}
+                    {blueMarkCheck ? (
+                        <InputGroupButton
+                            className={aiMutation.isPending && " cursor-wait"}
+                            onClick={handleAutoGenerate}
+                        >
+                            {/* This is make Button Effect changin when i click the Ai to generate
+                                                If AiMutation is Pending state It show the colorful AI Magic Button
+                                                If not Show only AI Brain
+                                            */}
+                            {aiMutation.isPending ? (
+                                <div
+                                    className="
+                                                             font-extrabold
+                                                            text-transparent
+                                                            bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500
+                                                            animate-gradient
+                                                            drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]
+                                                            "
+                                >
+                                    AI Magic ✨
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-1">
+                                    {" "}
+                                    AI <Brain />
+                                </div>
+                            )}
+                        </InputGroupButton>
+                    ) : (
+                        <InputGroupButton asChild>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <div>
+                                        <InputGroupButton>
+                                            AI <Brain />
+                                        </InputGroupButton>
+                                    </div>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>
+                                            <div className="flex items-center gap-3 text-blue-500">
+                                                <BadgeCheck />
+                                                <span>Warning</span>
+                                            </div>
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription className="text-md">
+                                            This AI feature is exclusive to
+                                            BlueMark verified users
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>
+                                            Cancel
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction className="bg-blue-500 text-white hover:bg-blue-600">
+                                            verified now
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </InputGroupButton>
+                    )}
+                </InputGroup>
+
+                {/* Text Area */}
+                <InputGroup className=" !border-none !shadow-none !ring-0 has-[textarea]:!ring-0 dark:!border-none dark:!ring-0 dark:!bg-transparent ">
+                    <InputGroupTextarea
+                        onChange={(e) => setData("body", e.target.value)}
+                        name="textarea"
+                        disabled={aiMutation.isPending}
+                        placeholder={`What's on your mind, ${auth.user.name}`}
+                    />
+                </InputGroup>
+
+                {/* Post Button  */}
+                <Button
+                    type="submit"
+                    className={isMobile ? "hidden" : ""}
+                    disabled={data.body && data.title ? false : true}
+                >
+                    Post
+                </Button>
+            </div>
+        </form>
+    );
+}
