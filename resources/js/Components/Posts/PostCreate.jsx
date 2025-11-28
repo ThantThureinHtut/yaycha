@@ -31,6 +31,7 @@ import {
     TriangleAlert,
     BadgeCheck,
     AlertCircleIcon,
+    ArrowLeft
 } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { AvatarImage } from "@/components/ui/avatar";
@@ -40,20 +41,17 @@ import { Separator } from "../ui/separator";
 import { Badge } from "../ui/badge";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import NProgress from "nprogress"; // Import the library
-import "nprogress/nprogress.css"; // Import the CSS
+// Import the CSS
 import axios from "axios";
 import { useTheme } from "@/src/Context/ThemeContext";
-
+import useAiGengerateTitle from "../Hooks/useAiGengerateTitle"; // this function does the Ai Title Generate Process
 export default function PostCreate() {
     const { auth } = usePage().props;
     const { setAi, setOpen } = useTheme();
     const [isMobile, setMobile] = useState(false);
     const blueMarkCheck = auth.user?.bluemark === 1;
-    const { data, setData, errors,setError, post, prcessing, isPending } = useForm({
-        title: "",
-        body: "",
-    });
+    const [isAiErrorMessage, setAiErrorMessage] = useState("");
+    const { data, setData, errors, setError, post, prcessing, isPending } =  useForm({title: "",body: "",});
 
     //This is use for resize and depend on the page size
     useEffect(() => {
@@ -69,44 +67,10 @@ export default function PostCreate() {
         return () => window.removeEventListener("resize", checkSize);
     }, []);
 
-    const [isAiErrorMessage, setAiErrorMessage] = useState("");
+
+    // This is come From Hooks Folder
+    const aiMutation = useAiGengerateTitle(setAi, setAiErrorMessage);
     // Fetch the Ai Generate Title from the backend
-    const aiMutation = useMutation({
-        mutationFn: async (bodyText) => {
-            const response = await axios.post(route("post.generate-title"), {
-                body: bodyText,
-            });
-            return response.data;
-        },
-        onSuccess: (e) => {
-            NProgress.done();
-            setAi(false);
-            setData("title", e.title);
-        },
-        onError: (e) => {
-            console.log(e);
-        },
-    });
-
-    // AI Auto Title Generate Submit
-    const handleAutoGenerate = async () => {
-        if (!data.body || data.body.length < 5) {
-            setAiErrorMessage("Please write content first!");
-            return;
-        }
-        NProgress.configure({ showSpinner: false });
-        NProgress.start();
-        try {
-            aiMutation.mutate(data.body);
-            setAi(true);
-            setAiErrorMessage("");
-            setError('body' , '')
-            setData("title", "Title is generating");
-        } catch (err) {
-            console.log(err);
-        }
-    };
-
     // Create the Post Submit
     const createPostHandler = (e) => {
         e.preventDefault();
@@ -118,12 +82,16 @@ export default function PostCreate() {
     return (
         <form
             onSubmit={createPostHandler}
-            className={`sm:max-w-xl flex items-center gap-2 ${
+            className={`sm:max-w-xl w-full flex items-center justify-center gap-2 ${
                 aiMutation.isPending ? "[&>button]:hidden cursor-wait" : ""
             }`}
         >
             <div className="grid flex-1 gap-2">
                 {/* Post User Image and Name */}
+                <div>
+                    <Link href="/home" className="md:hidden" ><ArrowLeft/></Link>
+                </div>
+
                 <div className="flex justify-between">
                     <div className="flex items-center gap-3 mb-2">
                         <Avatar>
@@ -141,7 +109,10 @@ export default function PostCreate() {
                     </div>
                     <Button
                         type="submit"
-                        disabled={aiMutation.isPending || (data.body && data.title ? false : true)}
+                        disabled={
+                            aiMutation.isPending ||
+                            (data.body && data.title ? false : true)
+                        }
                         className={isMobile ? "" : "hidden"}
                     >
                         Post
@@ -151,21 +122,25 @@ export default function PostCreate() {
                 {/* This Show the Error Message of Ai gen request */}
                 <div className="text-red-500">{isAiErrorMessage}</div>
 
-                    {
-                        (!errors.title && !errors.body) || (errors.title || errors.body) && (
-                            <Alert variant="destructive">
-                        <AlertCircleIcon />
-                        <AlertTitle>Unable to process Data.</AlertTitle>
-                        <AlertDescription>
-                            <ul className="list-inside list-disc text-sm">
-                                <li className={errors.title ? '' : 'hidden'}>{errors.title}</li>
-                                <li className={errors.body ? '' : 'hidden'}>{errors.body}</li>
-                            </ul>
-                        </AlertDescription>
-                    </Alert>
-                        )
-                    }
-
+                {(!errors.title && !errors.body) ||
+                    ((errors.title || errors.body) && (
+                        <Alert variant="destructive">
+                            <AlertCircleIcon />
+                            <AlertTitle>Unable to process Data.</AlertTitle>
+                            <AlertDescription>
+                                <ul className="list-inside list-disc text-sm">
+                                    <li
+                                        className={errors.title ? "" : "hidden"}
+                                    >
+                                        {errors.title}
+                                    </li>
+                                    <li className={errors.body ? "" : "hidden"}>
+                                        {errors.body}
+                                    </li>
+                                </ul>
+                            </AlertDescription>
+                        </Alert>
+                    ))}
 
                 <InputGroup>
                     <InputGroupInput
@@ -182,7 +157,7 @@ export default function PostCreate() {
                     {blueMarkCheck ? (
                         <InputGroupButton
                             className={aiMutation.isPending && " cursor-wait"}
-                            onClick={handleAutoGenerate}
+                            onClick={() => aiMutation.mutate(data.body)}
                         >
                             {/* This is make Button Effect changin when i click the Ai to generate
                                                 If AiMutation is Pending state It show the colorful AI Magic Button
@@ -191,11 +166,11 @@ export default function PostCreate() {
                             {aiMutation.isPending ? (
                                 <div
                                     className="
-                                                             font-extrabold
-                                                            text-transparent
-                                                            bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500
-                                                            animate-gradient
-                                                            drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]
+                                    font-extrabold
+                                    text-transparent
+                                    bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500
+                                    animate-gradient
+                                    drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]
                                                             "
                                 >
                                     AI Magic ✨

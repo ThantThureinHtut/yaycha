@@ -26,17 +26,18 @@ class PostController extends Controller
         $post = Post::create([
             'title' => $validated['title'],
             'description' => $validated['body'],
-            'user_id' => Auth::user()->id
+            'user_id' => Auth::id()
         ]);
-        $post->load([
-            'user:id,username,email,bluemark,avatar_url',
-            // You might want to initialize empty relations too so React doesn't crash on .map()
-            'likes',
-            'comments',
-            'views',
-            'saveds'
-        ]);
-        $post->loadCount(['likes', 'views', 'comments']);
+
+        // $post->load([
+        //     'user:id,username,email,bluemark,avatar_url',
+        //     // You might want to initialize empty relations too so React doesn't crash on .map()
+        //     'likes',
+        //     'comments',
+        //     'views',
+        //     'saveds'
+        // ]);
+        // $post->loadCount(['likes', 'views', 'comments']);
 
 
         // broadcast(new PostCreatedEvent($post))->toOthers();

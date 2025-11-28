@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\PostUpdatedEvent;
+use App\Events\PostViewEvent;
 use App\Models\Post;
 use App\Models\View;
 use Illuminate\Http\Request;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Redirect;
 
 class ViewController extends Controller
 {
-    public function index(){}
+
     public function store(Request $request){
         $view = View::updateOrCreate([
             'post_id' =>$request->post_id,
@@ -22,6 +23,9 @@ class ViewController extends Controller
             'user_id' => Auth::user()->id,
         ]);
 
-        return response()->json(['status' => 'ok']);
+        PostViewEvent::dispatch($view);
+        return response()->json([
+            'status' => 'ok'
+        ]);
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FollowController;
 use App\Models\Post;
 use App\Models\User;
 use Inertia\Inertia;
@@ -28,30 +29,45 @@ Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback']
 
 // Home route and Load the posts
 Route::get('/home', function () {
-    $posts = Post::with(['user:id,username,email,bluemark,avatar_url', 'likes.user:id,username,bluemark,avatar_url' , 'views.user:id,username,bluemark,avatar_url', 'comments.user:id,username,bluemark,avatar_url' , 'saveds']) // Load user and likes data efficiently
+    $posts = Post::with(['user:id,username,email,bluemark,avatar_url' , 'likes.user:id,username,bluemark,avatar_url' , 'views.user:id,username,bluemark,avatar_url', 'comments.user:id,username,bluemark,avatar_url' , 'saveds']) // Load user and likes data efficiently
     ->withCount(['likes' , 'views' , 'comments']) // Automatically counts likes as 'likes_count'
     ->latest()
     ->get();
-
-    return Inertia::render('Home', ['posts' => $posts]);
+    $user = User::where('id', Auth::user()->id)->withCount(['followers', 'followings'])->first();
+    $user->load([
+        'followers',
+        'followings'
+    ]);
+    return Inertia::render('Home', [
+        'posts' => $posts,
+        'auth' => [
+           'user' => $user
+        ]
+    ]);
 })->middleware(['auth', 'verified'])->name('home');
 
 Route::get('/search/', function () {
     return Inertia::render('SearchPage');
 });
-Route::group(['prefix' => '/post'], function () {
+
+// All Post Feature , Post , Like , Comment
+Route::group(['prefix' => '/post' , 'middleware' => 'auth'], function () {
     Route::get('/post_dashboard/', [PostController::class, 'index'])->name('post.dashboard');
     Route::post('/post_create', [PostController::class, 'post'])->name('post.create');
     Route::get('/post_views'  , [ViewController::class , 'index'])->name('post.view');
-    Route::post('/post_views_store'  , [ViewController::class , 'store'])->name('post.viewStore');
+    Route::post('/post/views/store'  , [ViewController::class , 'store'])->name('post.viewStore');
+    Route::post('/post/like/store')->name('post.likeStore');
     Route::post('/generate-title', [PostController::class, 'generateTitle'])
         ->name('post.generate-title')
         ->middleware('auth');
 });
 
 
-Route::group(['prefix' => '/acccount/'], function () {
+Route::group(['prefix' => '/acccount/' , 'middleware' => 'auth'], function () {
     Route::get('/', [ProfileController::class, 'account'])->name('account.dashboard');
+    Route::get('/profile.php' , [ProfileController::class , 'show'])->name('account.show');
+    Route::get('/follow/' , [FollowController::class , 'index'])->name('account.follow');
+    Route::post('/follow/{id}' ,[FollowController::class , 'store'])->name('account.follow.store');
     Route::group(['prefix' => '/profile_edit'], function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('account.edit');
         Route::post('/update', [ProfileController::class, 'update'])->name('profile.edit');

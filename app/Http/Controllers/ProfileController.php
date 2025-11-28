@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
+use App\Events\UserFollowerEvent;
+use App\Models\Post;
+use App\Models\User;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Redirect;
+use App\Http\Requests\ProfileUpdateRequest;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 class ProfileController extends Controller
 {
@@ -18,8 +21,63 @@ class ProfileController extends Controller
      */
     public function account()
     {
-        return Inertia::render('UserAccount/Account');
+        // Show authenticated user's account
+        $posts =  Post::with(['user:id,username,email,bluemark,avatar_url', 'likes.user:id,username,bluemark,avatar_url', 'views.user:id,username,bluemark,avatar_url', 'comments.user:id,username,bluemark,avatar_url', 'saveds']) // Load user and likes data efficiently
+            ->where('user_id', Auth::user()->id)
+            ->withCount(['likes', 'views', 'comments']) // Automatically counts likes as 'likes_count'
+            ->latest()
+            ->get();
+
+
+        $user = User::where('id', Auth::user()->id)->withCount(['followers', 'followings'])->first();
+        $user->load([
+            'followers',
+            'followings'
+        ]);
+        return Inertia::render('UserAccount/Account', [
+            'posts' => $posts,
+            'auth' => [
+                'user' => $user
+            ],
+        ]);
     }
+    /**
+     * Display the user's profile form.
+     */
+    public function show()
+    {
+        // Show another user's profile
+        $id = request()->query('id');
+        $posts = Post::with(['user:id,username,email,bluemark,avatar_url', 'likes.user:id,username,bluemark,avatar_url', 'views.user:id,username,bluemark,avatar_url', 'comments.user:id,username,bluemark,avatar_url', 'saveds']) // Load user and likes data efficiently
+                ->where('user_id', $id)
+                ->withCount(['likes', 'views', 'comments']) // Automatically counts likes as 'likes_count'
+                ->latest()
+                ->get();
+
+        // Load the user being viewed
+        // This is the user whose profile is being viewed by the authenticated user
+        $followingUser = User::where('id', $id)->withCount(['followers', 'followings'])->first();
+        $followingUser->load([
+            'followers',
+            'followings'
+        ]);
+
+        // Load the authenticated user's data
+        $user = User::where('id', Auth::user()->id)->withCount(['followers', 'followings'])->first();
+        $user->load([
+            'followers',
+            'followings'
+        ]);
+
+        return Inertia::render('UserAccount/ProfileShow', [
+            'posts' => $posts,
+            'followingUser' => $followingUser,
+            'auth' => [
+                'user' => $user
+            ],
+        ]);
+    }
+
     public function edit(Request $request): Response
     {
         return Inertia::render('UserAccount/ProfileEdit', [

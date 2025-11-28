@@ -19,14 +19,33 @@ import { ArrowLeft, Edit } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
-export default function AccountInformation({ posts: initialPosts}) {
+export default function AccountInformation({ posts: initialPosts , followingUser = null}) {
     const [posts, setPosts] = useState(initialPosts);
     const { auth } = usePage().props;
     const [ user , setUser] =  useState(auth.user);
 
-    usePostEcho(setPosts , user.id, setUser);
+    // Is Follow State
+    const [isFollow , setIsFollow] = useState(() => {
+        return user.followings.some(following => following.id === followingUser.id)
+    });
 
-    console.log(user);
+    // Post Echo for Realtime Update
+   usePostEcho(setPosts , null , setUser );
+
+    // Follow Unfollow Mutation
+   const followingMutation = useMutation({
+        mutationFn: () => {
+             return axios.post(route('account.follow.store' , followingUser.id))
+        },
+        onMutate: () => {
+            setIsFollow((prev) => !prev);
+        }
+    })
+
+    // Follow Unfollow Submit Handler
+     const followSubmitHandler =  () => {
+        followingMutation.mutate();
+    }
 
     return (
         <div className="container mx-auto">
@@ -47,26 +66,26 @@ export default function AccountInformation({ posts: initialPosts}) {
                                 <div className="flex flex-col  sm:flex-row sm:items-center gap-3 sm:gap-7">
                                     <Avatar className=" w-24 h-24">
                                         <AvatarImage
-                                            src={auth.user?.avatar_url}
+                                            src={followingUser?.avatar_url}
                                         />
                                     </Avatar>
                                     <div>
                                         <CardTitle className="text-xl sm:text-2xl">
                                             <div className="flex items-center gap-3">
-                                                <span>@{auth.user?.username}</span>
-
+                                                <span>@{followingUser?.username}</span>
+                                                <Button variant={isFollow ? 'outline' : 'default'} onClick={followSubmitHandler} >{isFollow ? 'Unfollow' : 'Follow'}</Button>
                                             </div>
                                         </CardTitle>
                                         <CardDescription className="text-sm sm:text-md">
                                             <div className="flex items-center gap-2">
                                                 <span>
-                                                    {user.followers_count ||
+                                                    {followingUser.followers_count ||
                                                         0}{" "}
                                                     followers
                                                 </span>
                                                 <Separator orientation="vertical" className="h-4" />
                                                 <span>
-                                                    {auth.user
+                                                    {followingUser
                                                         ?.followings_count ||
                                                         0}{" "}
                                                     followings
@@ -75,17 +94,12 @@ export default function AccountInformation({ posts: initialPosts}) {
                                         </CardDescription>
                                     </div>
                                 </div>
-                                <Link href={route("account.edit")}>
-                                    <Button>
-                                        <Edit />
-                                        Edit profile
-                                    </Button>
-                                </Link>
+
                             </div>
                         </CardHeader>
                         <Separator className="mb-8" />
                         <CardContent>
-                            <CardTitle>Your Posts</CardTitle>
+                            <CardTitle>{followingUser?.name}'s Posts</CardTitle>
                             <div className="rounded mt-4 mx-auto">
                                 <PostCreateBox />
                             </div>

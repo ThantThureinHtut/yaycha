@@ -78,8 +78,7 @@ class SocialiteController extends Controller
         // }
         $user = User::firstOrNew(['provider_id' => $authUser->id]);
         if (!$user->exists) {
-            $avatar = $avatar_name[rand(0, 13)]; // Your random logic
-
+            $avatar = $avatar_name[rand(0, 12)]; // Your random logic
             $user->avatar_url = 'https://api.dicebear.com/9.x/fun-emoji/svg?seed=' . $avatar;
             $user->username = str_replace(' ', '', $username); // Create username once
             $user->provider_method = $provider;

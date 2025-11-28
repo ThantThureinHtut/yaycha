@@ -12,7 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class PostCreatedEvent implements ShouldBroadcastNow
+class PostCreatedEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -34,6 +34,26 @@ class PostCreatedEvent implements ShouldBroadcastNow
     {
         return [
             new Channel('feed'),
+            new PrivateChannel('user.' . $this->post->user_id)
         ];
+    }
+    public function broadcastWith(): array
+    {
+       // 1. Re-Load Relationships (Worker needs this)
+    $this->post->load([
+        'user:id,username,email,bluemark,avatar_url',
+        'likes',
+        'comments',
+        'views',
+        'saveds'
+    ]);
+
+    // 2. Re-Load Counts (Worker needs this too!)
+    $this->post->loadCount(['likes', 'views', 'comments']);
+
+    // 3. Convert to Array (Prevents "Serialization of Closure" errors)
+    return [
+        'post' => $this->post->toArray()
+    ];
     }
 }

@@ -9,7 +9,7 @@ class Like extends Model
      protected $fillable = [
         'id',
         'post_id',
-        'user_Id'
+        'user_id'
     ];
 
     public function user(){
@@ -19,6 +19,8 @@ class Like extends Model
         // user.id <-> user_id correct
         // user.id <-> user_Id incorrect
         // if you want to connect , use the second argument
-        return $this->belongsTo(User::class , 'user_Id');
+        //  return $this->belongsTo(User::class  , 'user_Id);
+
+        return $this->belongsTo(User::class );
     }
 }
