@@ -44,6 +44,7 @@ export default function AccountInformation({ posts: initialPosts , followingUser
 
     // Follow Unfollow Submit Handler
      const followSubmitHandler =  () => {
+        user.followers_count = isFollow ? user.followers_count - 1 : user.followers_count + 1;
         followingMutation.mutate();
     }
 
@@ -79,7 +80,7 @@ export default function AccountInformation({ posts: initialPosts , followingUser
                                         <CardDescription className="text-sm sm:text-md">
                                             <div className="flex items-center gap-2">
                                                 <span>
-                                                    {followingUser.followers_count ||
+                                                    {user.followers_count ||
                                                         0}{" "}
                                                     followers
                                                 </span>

@@ -14,32 +14,34 @@ class FollowController extends Controller
 {
     public function index()
     {
-        $follow = User::with('followers', 'followings')->withCount(['followers', 'followings'])->where('id', Auth::user()->id)->first();
+        $follow = User::with('followers', 'followings');
         return response()->json(['follow' => $follow]);
     }
     public function store($id)
     {
-        // Check if the follow relationship already exists
-        $follow = Follow::where([
+
+        $existing = Follow::where([
             'user_id' => $id,
             'follower_id' => Auth::user()->id
         ])->first();
-            // If follow exists, unfollow
-        if ($follow) {
-            $follow->delete();
-            return [];
+            $followerUser = Auth::user();
+        if ($existing) {
+            $existing->delete();
+            UserFollowerEvent::dispatch($followerUser, $id, true);
+            return response()->json([
+                'status' => 'unfollowed'
+            ]);
         } else {
-            // Create new follow
-            $follow = Follow::create([
+            Follow::create([
                 'user_id' => $id,
                 'follower_id' => Auth::user()->id
             ]);
+            UserFollowerEvent::dispatch($followerUser, $id, false);
+            return response()->json([
+                'status' => 'followed'
+            ]);
         }
 
-        // Broadcast the follow/unfollow event
-        broadcast(new UserFollowerEvent($follow))->toOthers();
-        return response()->json([
-            'status' => 'oky'
-        ]);
+
     }
 }

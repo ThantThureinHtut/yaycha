@@ -31,10 +31,9 @@ import { useMutation } from "@tanstack/react-query";
 import { Button } from "../ui/button";
 import { Avatar, AvatarImage } from "../ui/avatar";
 
-export default function Blog({ post, user }) {
+export default function Blog({ post }) {
     const { auth } = usePage().props;
     const [isPressed, setPressed] = useState(false);
-
     const viewIn = useMutation({
         mutationFn: () => {
             axios.post(route("post.viewStore"), {
@@ -90,36 +89,50 @@ export default function Blog({ post, user }) {
                     <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
                             <div>
-                            <Link
-                                href={route("account.show", {
-                                    id: post.user.id,
-                                })}
-                            >
-                                <Avatar>
-                                    <AvatarImage src={post.user?.avatar_url} />
-                                </Avatar>
-                            </Link>
-                        </div>
-                        <div>
-                            <CardTitle>{post.title}</CardTitle>
-                            <CardDescription className="flex justify-between">
-                                <span className="flex items-center gap-2">
-                                    written by{" "}
-                                    <b className="flex items-center gap-2">
-                                        <span className="text-blue-500">
-                                            @{post.user.username}
-                                        </span>
-                                    </b>
-                                    {post.bluemark === 1 && <BlueMark />}
-                                </span>
-                            </CardDescription>
-                        </div>
+                                {post.user.id === auth.user.id ? (
+                                    <Link
+                                        href={route("account.dashboard")}
+                                    >
+                                        <Avatar>
+                                            <AvatarImage
+                                                src={post.user?.avatar_url}
+                                            />
+                                        </Avatar>
+                                    </Link>
+                                ) : (
+                                    <Link
+                                        href={route("account.show", {
+                                            id: post.user.id,
+                                        })}
+                                    >
+                                        <Avatar>
+                                            <AvatarImage
+                                                src={post.user?.avatar_url}
+                                            />
+                                        </Avatar>
+                                    </Link>
+                                )}
+                            </div>
+                            <div>
+                                <CardTitle>{post.title}</CardTitle>
+                                <CardDescription className="flex justify-between">
+                                    <span className="flex items-center gap-2">
+                                        written by{" "}
+                                        <b className="flex items-center gap-2">
+                                            <span className="text-blue-500">
+                                                @{post.user.username}
+                                            </span>
+                                        </b>
+                                        {post.bluemark === 1 && <BlueMark />}
+                                    </span>
+                                </CardDescription>
+                            </div>
                         </div>
 
                         <span className="flex items-center gap-2">
-                                {post.views_count_formatted}
-                                <Eye size={20} />
-                            </span>
+                            {post.views_count_formatted}
+                            <Eye size={20} />
+                        </span>
                     </div>
                 </CardHeader>
                 <Separator className="mb-4" />

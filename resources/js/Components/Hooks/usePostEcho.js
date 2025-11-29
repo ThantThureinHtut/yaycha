@@ -23,7 +23,7 @@ export default function usePostEcho(
         if (filterUserId) {
             // if user is use and access this usePostEcho with user id , show there data in their dashboard
             channelName = `user.${filterUserId}`;
-            followChannelName = `following.${filterUserId}`;
+            followChannelName = `follower.${filterUserId}`;
             channel = window.Echo.private(channelName);
             followChannel = window.Echo.private(followChannelName);
         } else {
@@ -84,16 +84,30 @@ export default function usePostEcho(
 
         // Follow
         followChannel.listen("UserFollowerEvent", (e) => {
-            console.log("Listen Data" , e);
             setUser((prevUser) => {
                 // Check the user exist , not -> return nothing , yes -> run rest
                 if (!prevUser) return;
+                const follower = e.follower;
+                // Unfollow Process
+                if (e.is_unfollow) {
+                    const newList = prevUser.followers.filter(
+                        (f) => f.id !== follower.id
+                    );
+                    return {
+                        ...prevUser,
+                        followers: newList,
+                        followers_count: newList.length,
+                        followers_count_formatted: formatNumber(newList.length),
+                    };
+                }
 
                 // Checking the followers and filtering the existing user.
-                const currentFollow = prevUser.followers || []
-                const alreadyFollow = currentFollow.some((follow) => follow.id === e.new_follower.id )
+                const currentFollow = prevUser.followers || [];
+                const alreadyFollow = currentFollow.some(
+                    (follow) => follow.id === follower.id
+                );
 
-                if(alreadyFollow) {
+                if (alreadyFollow) {
                     // if user is already exsit , return original value
                     return prevUser;
                 }
@@ -101,14 +115,15 @@ export default function usePostEcho(
                 // you(user1) follow the user 2
                 // user 1 POV: you(following user)
                 // user 2 POV : you(follower)
+                let new_followers = [...prevUser.followers, follower];
                 return {
                     ...prevUser,
-                    followers: [...prevUser.followers , e.new_follower ],
-                    followers_count: prevUser.followers_count + 1,
-                    followers_count_formatted: formatNumber(prevUser.followers_count + 1)
-                }
-
-
+                    followers: new_followers,
+                    followers_count: new_followers.length,
+                    followers_count_formatted: formatNumber(
+                        prevUser.followers_count
+                    ),
+                };
             });
         });
 

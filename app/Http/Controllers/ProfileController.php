@@ -21,13 +21,11 @@ class ProfileController extends Controller
      */
     public function account()
     {
-        // Show authenticated user's account
         $posts =  Post::with(['user:id,username,email,bluemark,avatar_url', 'likes.user:id,username,bluemark,avatar_url', 'views.user:id,username,bluemark,avatar_url', 'comments.user:id,username,bluemark,avatar_url', 'saveds']) // Load user and likes data efficiently
             ->where('user_id', Auth::user()->id)
             ->withCount(['likes', 'views', 'comments']) // Automatically counts likes as 'likes_count'
             ->latest()
             ->get();
-
 
         $user = User::where('id', Auth::user()->id)->withCount(['followers', 'followings'])->first();
         $user->load([
@@ -46,7 +44,7 @@ class ProfileController extends Controller
      */
     public function show()
     {
-        // Show another user's profile
+
         $id = request()->query('id');
         $posts = Post::with(['user:id,username,email,bluemark,avatar_url', 'likes.user:id,username,bluemark,avatar_url', 'views.user:id,username,bluemark,avatar_url', 'comments.user:id,username,bluemark,avatar_url', 'saveds']) // Load user and likes data efficiently
                 ->where('user_id', $id)
@@ -54,15 +52,11 @@ class ProfileController extends Controller
                 ->latest()
                 ->get();
 
-        // Load the user being viewed
-        // This is the user whose profile is being viewed by the authenticated user
         $followingUser = User::where('id', $id)->withCount(['followers', 'followings'])->first();
         $followingUser->load([
             'followers',
             'followings'
         ]);
-
-        // Load the authenticated user's data
         $user = User::where('id', Auth::user()->id)->withCount(['followers', 'followings'])->first();
         $user->load([
             'followers',

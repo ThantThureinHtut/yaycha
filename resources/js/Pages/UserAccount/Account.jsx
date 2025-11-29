@@ -25,9 +25,6 @@ export default function AccountInformation({ posts: initialPosts}) {
     const [ user , setUser] =  useState(auth.user);
 
     usePostEcho(setPosts , user.id, setUser);
-
-    console.log(user);
-
     return (
         <div className="container mx-auto">
             <div className="hidden sm:block">
