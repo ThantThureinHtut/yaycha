@@ -65,8 +65,4 @@ class Post extends Model
         return $this->hasMany(Comment::class);
     }
 
-    public function saveds()
-    {
-        return $this->hasMany(Saved::class);
-    }
 }

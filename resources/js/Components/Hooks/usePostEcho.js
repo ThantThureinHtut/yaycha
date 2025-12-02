@@ -83,7 +83,7 @@ export default function usePostEcho(
         });
 
         // Follow
-        followChannel.listen("UserFollowerEvent", (e) => {
+        channel.listen("UserFollowerEvent", (e) => {
             setUser((prevUser) => {
                 // Check the user exist , not -> return nothing , yes -> run rest
                 if (!prevUser) return;
@@ -126,6 +126,10 @@ export default function usePostEcho(
                 };
             });
         });
+
+        // Follow Private Noti
+        followChannel
+
 
         // 2. CLEANUP (Very Important)
         // When user leaves the page, cut the connection.
