@@ -30,10 +30,20 @@ import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "../ui/button";
 import { Avatar, AvatarImage } from "../ui/avatar";
+import { set } from "nprogress";
 
 export default function Blog({ post }) {
+    console.log(post);
+
     const { auth } = usePage().props;
-    const [isPressed, setPressed] = useState(false);
+    const [isPressed, setPressed] = useState(post.likes.some((like) => like.post_id === post.id && like.like_id === auth.user.id));
+       const formatNumber = (number) => {
+        return new Intl.NumberFormat("en-US", {
+            notation: "compact",
+            compactDisplay: "short",
+        }).format(number);
+    };
+
     const viewIn = useMutation({
         mutationFn: () => {
             axios.post(route("post.viewStore"), {
@@ -64,12 +74,22 @@ export default function Blog({ post }) {
         },
     });
 
-    const formatNumber = (number) => {
-        return new Intl.NumberFormat("en-US", {
-            notation: "compact",
-            compactDisplay: "short",
-        }).format(number);
-    };
+    const likeIn = useMutation({
+        mutationFn: () => {
+         axios.post(route("post.likeStore"), {
+                like_id: auth.user.id,
+                user_id : post.user_id,
+                post_id: post.id,
+            });
+        },
+        onMutate:  () => {
+            setPressed((prev) => !prev);
+            isPressed ? post.likes_count -= 1 : post.likes_count += 1;
+            post.likes_count_formatted = formatNumber(post.likes_count);
+        },
+    });
+
+
 
     const viewSumbitHandler = () => {
         // check , if the user is exist , don't increase the view count
@@ -81,7 +101,9 @@ export default function Blog({ post }) {
         if (alreadyViewed) return;
         viewIn.mutate();
     };
-
+    const likeSubmitHandler = () => {
+        likeIn.mutate();
+    }
     return (
         <div className="container flex flex-col gap-8 mx-auto my-3  md:w-full lg:w-1/2  ">
             <Card className="rounded-none">
@@ -148,7 +170,7 @@ export default function Blog({ post }) {
                             <ul className="flex justify-between items-center  w-full text-gray-500 ">
                                 <li className="flex items-center gap-1">
                                     {post.likes_count_formatted}
-                                    <div onClick={() => setPressed(!isPressed)}>
+                                    <div onClick={likeSubmitHandler}>
                                         <Heart
                                             size={20}
                                             className={
