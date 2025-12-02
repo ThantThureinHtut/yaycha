@@ -22,15 +22,14 @@ import { useState } from "react";
 export default function AccountInformation({ posts: initialPosts , followingUser = null}) {
     const [posts, setPosts] = useState(initialPosts);
     const { auth } = usePage().props;
-    const [ user , setUser] =  useState(auth.user);
 
     // Is Follow State
     const [isFollow , setIsFollow] = useState(() => {
-        return user.followings.some(following => following.id === followingUser.id)
+        return auth.user.followings.some(following => following.id === followingUser.id)
     });
 
     // Post Echo for Realtime Update
-   usePostEcho(setPosts , null , setUser );
+   usePostEcho(setPosts);
 
     // Follow Unfollow Mutation
    const followingMutation = useMutation({
@@ -44,7 +43,7 @@ export default function AccountInformation({ posts: initialPosts , followingUser
 
     // Follow Unfollow Submit Handler
      const followSubmitHandler =  () => {
-        user.followers_count = isFollow ? user.followers_count - 1 : user.followers_count + 1;
+        followingUser.followers_count = isFollow ? followingUser.followers_count - 1 : followingUser.followers_count + 1;
         followingMutation.mutate();
     }
 
@@ -80,7 +79,7 @@ export default function AccountInformation({ posts: initialPosts , followingUser
                                         <CardDescription className="text-sm sm:text-md">
                                             <div className="flex items-center gap-2">
                                                 <span>
-                                                    {user.followers_count ||
+                                                    {followingUser.followers_count ||
                                                         0}{" "}
                                                     followers
                                                 </span>

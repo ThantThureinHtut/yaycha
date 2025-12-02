@@ -2,7 +2,6 @@
 
 namespace App\Events;
 
-use App\Models\Like;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -11,17 +10,20 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class PostLikeEvent
+class FollowPrivateNotification implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * Create a new event instance.
      */
-    public $likes;
-    public function __construct(Like $likes)
+
+    public $userId;
+    public $followerUser;
+    public function __construct($followerUser, $userId)
     {
-        $this->likes = $likes;
+        $this->followerUser = $followerUser;
+        $this->userId = $userId;
     }
 
     /**
@@ -32,10 +34,16 @@ class PostLikeEvent
     public function broadcastOn(): array
     {
         return [
-            new Channel('feed'),
+            new PrivateChannel("follower.{$this->userId}"),
         ];
     }
-    public function broadcastWith(): array {
-        return [];
+    public function broadcastWith(): array
+    {
+        return [
+            'id' => $this->followerUser->id,
+            'username' => $this->followerUser->username,
+            'email' => $this->followerUser->email,
+            'userId' => $this->userId,
+        ];
     }
 }

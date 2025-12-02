@@ -1,11 +1,7 @@
-import { usePage } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import { useEffect } from "react";
-
-export default function usePostEcho(
-    setPosts,
-    filterUserId = null,
-    setUser = null // to make the follow and unfollow user data update useState
-) {
+import { toast } from "sonner";
+export default function usePostEcho(setPosts, filterUserId = null) {
     const { auth } = usePage().props;
     let channel = null;
     let followChannel = null;
@@ -82,60 +78,36 @@ export default function usePostEcho(
             });
         });
 
-        // Follow
-        channel.listen("UserFollowerEvent", (e) => {
-            setUser((prevUser) => {
-                // Check the user exist , not -> return nothing , yes -> run rest
-                if (!prevUser) return;
-                const follower = e.follower;
-                // Unfollow Process
-                if (e.is_unfollow) {
-                    const newList = prevUser.followers.filter(
-                        (f) => f.id !== follower.id
-                    );
-                    return {
-                        ...prevUser,
-                        followers: newList,
-                        followers_count: newList.length,
-                        followers_count_formatted: formatNumber(newList.length),
-                    };
-                }
-
-                // Checking the followers and filtering the existing user.
-                const currentFollow = prevUser.followers || [];
-                const alreadyFollow = currentFollow.some(
-                    (follow) => follow.id === follower.id
-                );
-
-                if (alreadyFollow) {
-                    // if user is already exsit , return original value
-                    return prevUser;
-                }
-                // if not , add the new follower user id ,
-                // you(user1) follow the user 2
-                // user 1 POV: you(following user)
-                // user 2 POV : you(follower)
-                let new_followers = [...prevUser.followers, follower];
-                return {
-                    ...prevUser,
-                    followers: new_followers,
-                    followers_count: new_followers.length,
-                    followers_count_formatted: formatNumber(
-                        prevUser.followers_count
-                    ),
-                };
+        // Follow Private Noti
+        followChannel.listen("FollowPrivateNotification", (e) => {
+            toast("Yaycha", {
+                description: `${e.username} is following you !!`,
+                action: {
+                    label: "See",
+                     onClick: () => {
+                        router.get(
+                            route("account.show", {
+                                id: e.id,
+                            })
+                        );
+                    },
+                },
             });
         });
-
-        // Follow Private Noti
-        followChannel
-
 
         // 2. CLEANUP (Very Important)
         // When user leaves the page, cut the connection.
         return () => {
-            window.Echo.leave(channelName);
-            window.Echo.leave(followChannelName);
+            if (channel) {
+                channel.stopListening("PostViewEvent");
+                channel.stopListening("PostCreatedEvent");
+            }
+            if (followChannel) {
+                followChannel.stopListening("FollowPrivateNotification");
+            }
+            // Then leave the channel completely
+            if (channelName) window.Echo.leave(channelName);
+            if (followChannelName) window.Echo.leave(followChannelName);
         };
-    }, []);
+    }, [filterUserId]);
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\FollowController;
+use App\Http\Controllers\LikeController;
 use App\Models\Post;
 use App\Models\User;
 use Inertia\Inertia;
@@ -56,7 +57,7 @@ Route::group(['prefix' => '/post' , 'middleware' => 'auth'], function () {
     Route::post('/post_create', [PostController::class, 'post'])->name('post.create');
     Route::get('/post_views'  , [ViewController::class , 'index'])->name('post.view');
     Route::post('/post/views/store'  , [ViewController::class , 'store'])->name('post.viewStore');
-    Route::post('/post/like/store')->name('post.likeStore');
+    Route::post('/post/like/store' , [LikeController::class , 'store'])->name('post.likeStore');
     Route::post('/generate-title', [PostController::class, 'generateTitle'])
         ->name('post.generate-title')
         ->middleware('auth');

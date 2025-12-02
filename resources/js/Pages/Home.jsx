@@ -6,7 +6,7 @@ import Blog from "@/Components/Blogs/Blog";
 import usePostEcho from "@/Components/Hooks/usePostEcho";
 export default function Home({ posts: initialPosts }) {
     const [posts, setPosts] = useState(initialPosts);
-    usePostEcho(setPosts);
+    usePostEcho(setPosts );
     return (
         <GuestLayout>
             <div>

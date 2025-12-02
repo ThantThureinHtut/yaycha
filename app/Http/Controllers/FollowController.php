@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\FollowPrivateNotification;
 use App\Events\UserFollowerEvent;
 use App\Models\User;
 use App\Models\Follow;
@@ -27,7 +28,6 @@ class FollowController extends Controller
             $followerUser = Auth::user();
         if ($existing) {
             $existing->delete();
-            UserFollowerEvent::dispatch($followerUser, $id, true);
             return response()->json([
                 'status' => 'unfollowed'
             ]);
@@ -36,8 +36,13 @@ class FollowController extends Controller
                 'user_id' => $id,
                 'follower_id' => Auth::user()->id
             ]);
-            UserFollowerEvent::dispatch($followerUser, $id, false);
-            return response()->json([
+
+            // Dispatch Event for Private Notification
+
+                FollowPrivateNotification::dispatch($followerUser, $id);
+
+
+             return response()->json([
                 'status' => 'followed'
             ]);
         }
