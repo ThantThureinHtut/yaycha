@@ -21,7 +21,7 @@ class ProfileController extends Controller
      */
     public function account()
     {
-        $posts =  Post::with(['user:id,username,email,bluemark,avatar_url', 'likes.user:id,username,bluemark,avatar_url', 'views.user:id,username,bluemark,avatar_url', 'comments.user:id,username,bluemark,avatar_url']) // Load user and likes data efficiently
+        $posts =  Post::with(['user:id,username,email,bluemark,avatar_url', 'likes.user:id,username,bluemark,avatar_url', 'views', 'comments.user:id,username,bluemark,avatar_url']) // Load user and likes data efficiently
             ->where('user_id', Auth::user()->id)
             ->withCount(['likes', 'views', 'comments']) // Automatically counts likes as 'likes_count'
             ->latest()
@@ -46,7 +46,7 @@ class ProfileController extends Controller
     {
 
         $id = request()->query('id');
-        $posts = Post::with(['user:id,username,email,bluemark,avatar_url', 'likes', 'views.user:id,username,bluemark,avatar_url', 'comments.user:id,username,bluemark,avatar_url']) // Load user and likes data efficiently
+        $posts = Post::with(['user:id,username,email,bluemark,avatar_url', 'likes', 'views', 'comments.user:id,username,bluemark,avatar_url']) // Load user and likes data efficiently
                 ->where('user_id', $id)
                 ->withCount(['likes', 'views', 'comments']) // Automatically counts likes as 'likes_count'
                 ->latest()
