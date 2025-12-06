@@ -41,7 +41,7 @@ export default function SearchBox() {
                 setUsers([]);
                 setOpen(false);
             }
-        }, 400);
+        }, 300);
 
         return () => {
             clearTimeout(SearchTimeSet);
@@ -64,7 +64,7 @@ export default function SearchBox() {
                 </InputGroup>
             </div>
             {open && (
-                <div className=" absolute mt-2 w-full p-3 bg-white/60 dark:bg-secondary/60 shadow-sm backdrop-blur-sm rounded-b-lg flex flex-col gap-3 max-h-96 overflow-y-auto">
+                <div className=" absolute mt-2 w-full p-3 bg-white/60 dark:bg-secondary/60 shadow-sm backdrop-blur-sm rounded-b-lg flex flex-col gap-3 max-h-96 overflow-y-auto custom-scrollbar ">
                         {/* If user have , Show the search User Data */}
                         {users &&
                         users.map((user) => (

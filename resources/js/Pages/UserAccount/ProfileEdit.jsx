@@ -44,22 +44,21 @@ export default function ProfileEdit() {
     });
 
     useEffect(() => {
-    if (recentlySuccessful) {
-        toast.success("Yaycha" , {
-            description: "Success! Your changes have been saved",
-            variant: "success",
-        });
-    }
-}, [recentlySuccessful]);
+        if (recentlySuccessful) {
+            toast.success("Yaycha", {
+                description: "Success! Your changes have been saved",
+                variant: "success",
+            });
+        }
+    }, [recentlySuccessful]);
     const submitHandler = (e) => {
         e.preventDefault();
-        post(route("profile.edit"))
+        post(route("profile.edit"));
     };
     const deleteHandler = (e) => {
         e.preventDefault();
         post(route("account.delete"));
     };
-
 
     return (
         <div>
@@ -135,16 +134,21 @@ export default function ProfileEdit() {
                                     <OctagonAlert />
                                 </div>
                                 <div>
-                                    <AlertTitle className="text-lg">
-                                        Delete Account
+                                    <AlertTitle>
+                                        <span className="text-lg">
+                                            Delete Account
+                                        </span>
                                     </AlertTitle>
                                     <AlertDescription>
-                                        Are you sure you want to delete your
-                                        account? Once your account is deleted,
-                                        all of your resources and data will be
-                                        permanently deleted. Please enter your
-                                        password to confirm you would like to
-                                        permanently delete your account.
+                                        <span className="text-sm">
+                                            Are you sure you want to delete your
+                                            account? Once your account is
+                                            deleted, all of your resources and
+                                            data will be permanently deleted.
+                                            Please enter your password to
+                                            confirm you would like to
+                                            permanently delete your account.
+                                        </span>
                                     </AlertDescription>
                                 </div>
                             </Alert>
