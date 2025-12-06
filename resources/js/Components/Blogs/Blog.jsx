@@ -102,6 +102,7 @@ export default function Blog({ post }) {
     };
     const likeSubmitHandler = () => {
         likeIn.mutate();
+        viewSumbitHandler()
     }
     return (
         <div className="container flex flex-col gap-8 mx-auto my-3  md:w-full lg:w-1/2  ">

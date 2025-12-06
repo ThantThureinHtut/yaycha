@@ -64,8 +64,9 @@ export default function SearchBox() {
                 </InputGroup>
             </div>
             {open && (
-                <div className=" absolute mt-2 w-full p-3 bg-white/80 shadow-sm backdrop-blur-sm rounded-b-lg flex flex-col gap-3 max-h-96 overflow-y-auto">
-                    {users &&
+                <div className=" absolute mt-2 w-full p-3 bg-white/60 dark:bg-secondary/60 shadow-sm backdrop-blur-sm rounded-b-lg flex flex-col gap-3 max-h-96 overflow-y-auto">
+                        {/* If user have , Show the search User Data */}
+                        {users &&
                         users.map((user) => (
                             <div key={user.id}>
                                 <Link href={user.id !== auth.user.id ? route("account.show" , {id: user.id}) : route("account.dashboard") }>
@@ -97,6 +98,9 @@ export default function SearchBox() {
                                 </Link>
                             </div>
                         ))}
+
+                        {/* Not Found Message Show there is no data return */}
+                      {users.length === 0 && <h1 className="text-center text-lg ">Not Found</h1>}
                 </div>
             )}
         </div>

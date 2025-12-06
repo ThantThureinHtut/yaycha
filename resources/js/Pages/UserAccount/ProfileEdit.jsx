@@ -24,6 +24,8 @@ import {
 import { Separator } from "@/Components/ui/separator";
 import { Link, useForm, usePage } from "@inertiajs/react";
 import { ArrowLeft, CheckCircle2Icon, OctagonAlert } from "lucide-react";
+import { toast } from "sonner";
+import { useEffect } from "react";
 
 export default function ProfileEdit() {
     const { auth } = usePage().props;
@@ -40,16 +42,25 @@ export default function ProfileEdit() {
         email: auth.user?.email,
         password: "",
     });
+
+    useEffect(() => {
+    if (recentlySuccessful) {
+        toast.success("Yaycha" , {
+            description: "Success! Your changes have been saved",
+            variant: "success",
+        });
+    }
+}, [recentlySuccessful]);
     const submitHandler = (e) => {
         e.preventDefault();
-        post(route("profile.edit"));
+        post(route("profile.edit"))
     };
     const deleteHandler = (e) => {
         e.preventDefault();
-        console.log(data.password);
-
         post(route("account.delete"));
     };
+
+
     return (
         <div>
             {/* Header */}
@@ -60,23 +71,6 @@ export default function ProfileEdit() {
                 onSubmit={submitHandler}
                 className="flex flex-col items-center justify-center overflow-auto my-4 "
             >
-                {recentlySuccessful && (
-                    <Alert className="container flex gap-3 my-3 text-green-500 border-green-500">
-                        <div className=" text-green-500">
-                            <CheckCircle2Icon />
-                        </div>
-                        <div>
-                            <AlertTitle>
-                                Success! Your changes have been saved
-                            </AlertTitle>
-                            <AlertDescription>
-                                This is an alert with icon, title and
-                                description.
-                            </AlertDescription>
-                        </div>
-                    </Alert>
-                )}
-
                 <Card className="container rounded-none sm:rounded-lg">
                     <CardHeader className="gap-2">
                         <div>
