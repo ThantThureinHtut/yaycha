@@ -33,7 +33,6 @@ import { Avatar, AvatarImage } from "../ui/avatar";
 import { set } from "nprogress";
 
 export default function Blog({ post }) {
-    console.log(post);
 
     const { auth } = usePage().props;
     const [isPressed, setPressed] = useState(post.likes.some((like) => like.post_id === post.id && like.like_id === auth.user.id));
@@ -180,11 +179,7 @@ export default function Blog({ post }) {
                                         />
                                     </div>
                                 </li>
-                                <li className="flex gap-6">
-                                    <span className="flex items-center gap-1 ">
-                                        2k
-                                        <Save size={20} />
-                                    </span>
+                                <li>
                                     <span className="flex items-center gap-1">
                                         {post.comments_count_formatted}
                                         <MessageSquare size={20} />

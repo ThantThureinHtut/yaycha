@@ -1,0 +1,232 @@
+BELONGSTOMANY (Eloquent Relationship) - Explanation & Usage
+============================================================
+
+Purpose
+-------
+The `belongsToMany` relation in Laravel Eloquent defines a many-to-many relationship between two models. Use it when records of model A can be related to many records of model B and vice versa (e.g., `User` ⇄ `Role`).
+
+Key Concepts
+------------
+- Pivot table: an intermediate table that holds the relationship rows and any extra columns (e.g., `role_user` with `user_id`, `role_id`, `granted_at`).
+- Pivot model: optional Eloquent model that represents the pivot table so you can access pivot-specific logic.
+- Convention: pivot table name is the singular model names in alphabetical order separated by an underscore (e.g., `role_user`). Pivot foreign key columns use singular model name + `_id` by default (e.g., `user_id`, `role_id`).
+
+Method signature
+----------------
+The `belongsToMany` method signature is:
+
+    belongsToMany($related, $table = null, $foreignPivotKey = null, $relatedPivotKey = null, $parentKey = null, $relatedKey = null, $relation = null)
+
+Parameter meanings
+------------------
+- `$related` (string): The fully-qualified class name (or short class name resolved by namespace) of the related model. Example: `App\Models\Role::class`.
+
+- `$table` (string|null): The pivot table name. Default: Laravel infers it from the two model names in alphabetical order: `role_user` for `Role` and `User`.
+
+- `$foreignPivotKey` (string|null): The column name on the pivot table that references the *current (parent) model*. For example, when defining on `User` model, default is `user_id`.
+
+- `$relatedPivotKey` (string|null): The column name on the pivot table that references the *related model*. For example, when defining on `User` model referencing `Role`, default is `role_id`.
+
+- `$parentKey` (string|null): The local (primary) key column name on the parent model. Default: typically `id`.
+
+- `$relatedKey` (string|null): The local (primary) key column name on the related model. Default: typically `id`.
+
+- `$relation` (string|null): The name of the Eloquent relation. Usually not needed — Laravel auto-detects it from the method name.
+
+Default conventions summary
+--------------------------
+- Pivot table name: alphabetical singular model names joined by underscore (e.g., `post_tag` for `Post` and `Tag`).
+- Pivot columns: `{singular_parent}_id`, `{singular_related}_id` (e.g., `user_id`, `role_id`).
+- Primary keys: `id` on both models by default.
+
+Example model relationship definitions
+--------------------------------------
+User model (app/Models/User.php):
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class); // uses role_user, user_id, role_id
+    }
+
+Role model (app/Models/Role.php):
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class); // uses role_user, role_id, user_id
+    }
+
+Custom pivot table and custom column names
+------------------------------------------
+If your pivot table or column names don't follow conventions, pass them in the method:
+
+    // Custom pivot table 'assignments' and custom pivot keys
+    return $this->belongsToMany(Role::class, 'assignments', 'member_id', 'role_ref_id');
+
+Here:
+- `'assignments'` is the pivot table.
+- `'member_id'` is the column on `assignments` that points to the current model.
+- `'role_ref_id'` is the column on `assignments` that points to the related `Role`.
+
+Migrations for pivot table
+--------------------------
+A simple pivot migration (conventional names):
+
+    Schema::create('role_user', function (Blueprint $table) {
+        $table->id();           // optional, pivot can be without id
+        $table->foreignId('user_id')->constrained()->onDelete('cascade');
+        $table->foreignId('role_id')->constrained()->onDelete('cascade');
+        $table->timestamps();   // optional if you want created_at/updated_at on pivot
+        $table->unique(['user_id','role_id']);
+    });
+
+You may omit `$table->id()` and use the composite unique key `['user_id', 'role_id']` as the primary constraint.
+
+Working with pivot data (attach, detach, sync, toggle)
+------------------------------------------------------
+Assume `User` has `roles()` relation.
+
+Attach role(s):
+
+    $user->roles()->attach($roleId); // single id
+    $user->roles()->attach([$roleId1, $roleId2]); // multiple
+
+Attach with extra pivot data:
+
+    $user->roles()->attach($roleId, ['granted_by' => $adminId, 'granted_at' => now()]);
+
+Detach role(s):
+
+    $user->roles()->detach($roleId);
+    $user->roles()->detach(); // detach all roles
+
+Sync roles (replace current list):
+
+    $user->roles()->sync([$roleId1, $roleId2]);
+
+Sync without detaching existing (add only new):
+
+    $user->roles()->syncWithoutDetaching([$roleId3]);
+
+Toggle (attach if missing, detach if exists):
+
+    $user->roles()->toggle([$roleId]);
+
+Check if model has relation:
+
+    $user->roles()->where('roles.id', $roleId)->exists();
+
+Retrieving pivot columns
+------------------------
+When loading relation, access pivot properties via `pivot` attribute:
+
+    $user = User::with('roles')->find(1);
+    foreach ($user->roles as $role) {
+        echo $role->pivot->created_at;    // if timestamps on pivot
+        echo $role->pivot->granted_by;    // extra pivot column
+    }
+
+Tell Eloquent you want pivot columns returned:
+
+    return $this->belongsToMany(Role::class)->withPivot('granted_by', 'granted_at');
+
+Using `withTimestamps()` on relationship
+----------------------------------------
+If your pivot table has `created_at` and `updated_at` columns and you want Eloquent to maintain them automatically:
+
+    return $this->belongsToMany(Role::class)->withTimestamps();
+
+Using a custom Pivot model
+--------------------------
+Create a pivot model class that extends `Illuminate\Database\Eloquent\Relations\Pivot`:
+
+    namespace App\Models\Pivots;
+
+    use Illuminate\Database\Eloquent\Relations\Pivot;
+
+    class RoleUser extends Pivot
+    {
+        protected $table = 'role_user';
+        // add methods or accessors for pivot-specific logic
+    }
+
+Then use it in the relationship:
+
+    return $this->belongsToMany(Role::class)->using(RoleUser::class)->withPivot('granted_by');
+
+This allows attaching model events and custom logic on pivot records.
+
+Querying based on pivot columns
+------------------------------
+You can add `wherePivot` and `wherePivotIn` to constrain queries using pivot columns:
+
+    // Users who were granted a role by adminId
+    User::whereHas('roles', function ($q) use ($adminId) {
+        $q->wherePivot('granted_by', $adminId);
+    })->get();
+
+    // Or on a loaded relation
+    $user->roles()->wherePivot('granted_by', $adminId)->get();
+
+Ordering by pivot
+-----------------
+
+    $user->roles()->orderByPivot('created_at', 'desc')->get();
+
+Polymorphic many-to-many (morphToMany)
+--------------------------------------
+If different models can share tags, use polymorphic many-to-many (`morphToMany`). Example: `Post` and `Video` both have many `Tag`s via a `taggables` pivot.
+
+    // In Post model
+    public function tags()
+    {
+        return $this->morphToMany(Tag::class, 'taggable');
+    }
+
+Important Notes & Common Pitfalls
+--------------------------------
+- If you change pivot table or column names, always supply `$table`, `$foreignPivotKey` and `$relatedPivotKey` when defining the relationship.
+- Use `withPivot()` to expose additional pivot columns to the retrieved models.
+- Remember to add `withTimestamps()` if pivot table has timestamps and you want them maintained automatically.
+- For large datasets, eager-load relations (`with('roles')`) to avoid N+1 queries.
+- When using `sync()` with extra pivot data, pass an associative array: `['roleId' => ['expires_at' => ...]]`.
+
+Examples
+--------
+1) Basic: attach/detach
+
+    $user->roles()->attach(3);
+    $user->roles()->detach(3);
+
+2) Attach with pivot data
+
+    $user->roles()->attach(2, ['granted_by' => auth()->id(), 'granted_at' => now()]);
+
+3) Sync with pivot data (replace existing relations)
+
+    $user->roles()->sync([
+        1 => ['granted_at' => now()],
+        2 => ['granted_at' => now()->subDay()],
+    ]);
+
+4) Using a custom pivot model and retrieving pivot info
+
+    // User.php
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class)->using(RoleUser::class)->withPivot('granted_by')->withTimestamps();
+    }
+
+    // Later
+    $role = $user->roles()->first();
+    echo $role->pivot->granted_by;
+
+Conclusion & Recommended Readings
+--------------------------------
+- Use Laravel conventions where possible; override parameters when necessary.
+- Prefer `sync()` when you need to ensure an exact set of relations.
+- Use `withPivot()` and `withTimestamps()` to work with any additional pivot data cleanly.
+- Consider a Pivot model (`using()`) for complex pivot logic.
+
+Laravel Docs: https://laravel.com/docs/ (search "Eloquent: Many To Many")
+
+File created at project root: `BELONGSTOMANY_EXPLAINED.txt`

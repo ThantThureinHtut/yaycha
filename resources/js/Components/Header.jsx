@@ -176,7 +176,7 @@ export default function Header() {
                                         </li>
 
                                         <li className="w-full">
-                                            <Link className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded">
+                                            <Link href={route('acccount.liked.posts.show')} className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded">
                                                 <ThumbsUp />
                                                 <p className="text-lg sm:text-sm">
                                                     Liked Posts

@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Models\Like;
+use App\Models\Post;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -11,17 +12,19 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class PostLikeEvent
+class PostLikeEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * Create a new event instance.
      */
-    public $likes;
-    public function __construct(Like $likes)
+
+    public $postId;
+    public function __construct($postId)
     {
-        $this->likes = $likes;
+
+        $this->postId = $postId;
     }
 
     /**
@@ -35,7 +38,12 @@ class PostLikeEvent
             new Channel('feed'),
         ];
     }
-    public function broadcastWith(): array {
-        return [];
+    public function broadcastWith():array
+    {
+        $likes_count = Like::where('post_id', $this->postId)->count();
+        return [
+            'post_id' => $this->postId,
+            'likes_count' => $likes_count
+        ];
     }
 }

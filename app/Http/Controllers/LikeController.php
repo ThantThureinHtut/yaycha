@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Like;
 use Illuminate\Http\Request;
+use App\Events\PostLikeEvent;
+use App\Events\PostLikePrivateNotification;
+use Illuminate\Support\Facades\Auth;
 
 class LikeController extends Controller
 {
@@ -21,15 +24,21 @@ class LikeController extends Controller
         if ($existingLike) {
             // If it exists, remove the like (unlike)
             $existingLike->delete();
+            PostLikeEvent::dispatch($postId);
             return response()->json(['status' => 'unliked']);
         } else {
             // If it doesn't exist, create a new like
-            Like::create([
+             Like::create([
                 'post_id' => $postId,
                 'user_id' => $userId,
                 'like_id' => $likeId,
             ]);
 
+            PostLikeEvent::dispatch($postId);
+            $currentUser = Auth::user();
+            if($currentUser->id  !== $userId ) {
+                PostLikePrivateNotification::dispatch($userId , $currentUser , $postId);
+            }
             return response()->json(['status' => 'liked']);
         }
     }

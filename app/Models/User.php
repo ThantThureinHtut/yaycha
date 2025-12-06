@@ -11,11 +11,11 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
-
+use Laravel\Scout\Searchable;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable , Searchable;
 
     /**
      * The attributes that are mass assignable.
@@ -64,6 +64,30 @@ class User extends Authenticatable
         ];
     }
 
+
+    public function searchableAs():string
+    {
+        return 'users_index';
+    }
+
+    /**
+     * Get the indexable data array for model
+     */
+    public function toSearchableArray():array
+    {
+       return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'username' => $this->username,
+            'avatar_url' => $this->avatar_url,
+            'bluemark' => $this->bluemark,
+            'followers_count_formatted' => $this->followers_count_formatted
+       ];
+    }
+
+
+
     // Make the Own Attribute
     protected function hasPassword(): Attribute
     {
@@ -74,7 +98,7 @@ class User extends Authenticatable
     protected function followersCountFormatted(): Attribute
     {
         return Attribute::make(
-            get: function() {
+            get: function () {
                 $this->loadCount('followers');
                 return Number::abbreviate($this->followers_count);
             }
@@ -83,7 +107,7 @@ class User extends Authenticatable
     protected function followingsCountFormatted(): Attribute
     {
         return Attribute::make(
-            get: function() {
+            get: function () {
                 $this->loadCount('followings');
                 return Number::abbreviate($this->followings_count);
             }
@@ -99,6 +123,32 @@ class User extends Authenticatable
     {
         return $this->hasMany(Like::class);
     }
+
+
+    public function likedPosts()
+    {
+        // usage: $this->belongsToMany(Model, table_name, my_id_in_table, other_id_in_table)
+        /**
+         * Model -> what you want
+         * Table_name -> which is use for bridge
+         * My_id_in_table -> which is refer current you | login user
+         * Other_id_in_table -> the id you want to connect with Post::class
+         *
+         * so i idea is like (You get   Post where id == post_id WHERE like_id = Auth::id() )
+         * User liked the many posts  ( 1 To M)
+         * Posts liked by Many User  (1 To M)
+         * Result: It is M to M relation between User and Posts
+         * So Can't connect directly , need to bridge
+         *
+         * SELECT posts* FROM posts
+           INNER JOIN likes
+           ON posts.id = likes.post_id
+           WHERE likes.user_id = Auth::user()
+         */
+        return $this->belongsToMany(Post::class, 'likes', 'like_id', 'post_id')
+            ->withTimestamps(); // If you want to know WHEN they liked it
+    }
+
     public function views()
     {
         return $this->hasMany(View::class);
@@ -120,4 +170,6 @@ class User extends Authenticatable
         // "I am the follower_id, give me the people in the user_id column"
         return $this->belongsToMany(User::class, 'follows', 'follower_id', 'user_id');
     }
+
+
 }

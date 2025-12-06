@@ -26,7 +26,7 @@ class PostController extends Controller
         $post = Post::create([
             'title' => $validated['title'],
             'description' => $validated['body'],
-            'user_id' => Auth::id()
+            'user_id' => Auth::user()->id
         ]);
 
         // $post->load([

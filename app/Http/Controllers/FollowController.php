@@ -25,7 +25,9 @@ class FollowController extends Controller
             'user_id' => $id,
             'follower_id' => Auth::user()->id
         ])->first();
-            $followerUser = Auth::user();
+
+        $followerUser = Auth::user();
+
         if ($existing) {
             $existing->delete();
             return response()->json([
@@ -38,8 +40,7 @@ class FollowController extends Controller
             ]);
 
             // Dispatch Event for Private Notification
-
-                FollowPrivateNotification::dispatch($followerUser, $id);
+            FollowPrivateNotification::dispatch($followerUser, $id);
 
 
              return response()->json([

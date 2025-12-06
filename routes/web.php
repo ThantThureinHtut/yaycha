@@ -30,7 +30,7 @@ Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback']
 
 // Home route and Load the posts
 Route::get('/home', function () {
-    $posts = Post::with(['user:id,username,email,bluemark,avatar_url' , 'likes.user:id,username,bluemark,avatar_url' , 'views', 'comments.user:id,username,bluemark,avatar_url']) // Load user and likes data efficiently
+    $posts = Post::with(['user:id,username,email,bluemark,avatar_url' , 'likes' , 'views', 'comments.user:id,username,bluemark,avatar_url']) // Load user and likes data efficiently
     ->withCount(['likes' , 'views' , 'comments']) // Automatically counts likes as 'likes_count'
     ->latest()
     ->get();
@@ -47,9 +47,12 @@ Route::get('/home', function () {
     ]);
 })->middleware(['auth', 'verified'])->name('home');
 
+// User Search Page And Search Route
 Route::get('/search/', function () {
     return Inertia::render('SearchPage');
 });
+Route::post('/search/user/' , [ProfileController::class , 'search'] )->name('user.search');
+
 
 // All Post Feature , Post , Like , Comment
 Route::group(['prefix' => '/post' , 'middleware' => 'auth'], function () {
@@ -64,11 +67,12 @@ Route::group(['prefix' => '/post' , 'middleware' => 'auth'], function () {
 });
 
 
-Route::group(['prefix' => '/acccount/' , 'middleware' => 'auth'], function () {
+Route::group(['prefix' => '/account/' , 'middleware' => 'auth'], function () {
     Route::get('/', [ProfileController::class, 'account'])->name('account.dashboard');
     Route::get('/profile.php' , [ProfileController::class , 'show'])->name('account.show');
     Route::get('/follow/' , [FollowController::class , 'index'])->name('account.follow');
     Route::post('/follow/{id}' ,[FollowController::class , 'store'])->name('account.follow.store');
+    Route::get('/liked/posts' , [ProfileController::class , 'liked_show'])->name('acccount.liked.posts.show');
     Route::group(['prefix' => '/profile_edit'], function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('account.edit');
         Route::post('/update', [ProfileController::class, 'update'])->name('profile.edit');

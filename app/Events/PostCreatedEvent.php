@@ -45,7 +45,6 @@ class PostCreatedEvent implements ShouldBroadcast
         'likes',
         'comments',
         'views',
-        'saveds'
     ]);
 
     // 2. Re-Load Counts (Worker needs this too!)

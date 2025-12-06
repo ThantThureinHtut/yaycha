@@ -13,3 +13,7 @@ Broadcast::channel('user.{id}' , function($user , $id){
 Broadcast::channel('follower.{id}' , function($user , $id){
     return (int) $user->id === (int) $id;
 });
+
+Broadcast::channel('like.{id}' , function($user , $id) {
+    return (int) $user->id === (int) $id;
+});

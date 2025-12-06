@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\UserFollowerEvent;
+use App\Models\Like;
 use App\Models\Post;
 use App\Models\User;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\Request;
+use App\Events\UserFollowerEvent;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Http\JsonResponse;
 
 class ProfileController extends Controller
 {
@@ -42,15 +44,15 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
-    public function show()
+    public function show():Response
     {
 
         $id = request()->query('id');
         $posts = Post::with(['user:id,username,email,bluemark,avatar_url', 'likes', 'views', 'comments.user:id,username,bluemark,avatar_url']) // Load user and likes data efficiently
-                ->where('user_id', $id)
-                ->withCount(['likes', 'views', 'comments']) // Automatically counts likes as 'likes_count'
-                ->latest()
-                ->get();
+            ->where('user_id' , $id)
+            ->withCount(['likes', 'views', 'comments']) // Automatically counts likes as 'likes_count'
+            ->latest()
+            ->get();
 
         $followingUser = User::where('id', $id)->withCount(['followers', 'followings'])->first();
         $followingUser->load([
@@ -94,6 +96,34 @@ class ProfileController extends Controller
         $request->user()->save();
 
         return Redirect::route('account.edit');
+    }
+
+
+    /**
+     * Your Liked Post
+     */
+
+    public function liked_show():Response
+    {
+           $posts = Auth::user()->likedPosts()->with(['user:id,username,email,bluemark,avatar_url' , 'likes' , 'views']) // Load the author of the post
+            ->withCount(['likes', 'views', 'comments'])
+            ->latest() // Sort by when I liked them!
+            ->get();
+
+        logger($posts->toArray());
+        return Inertia::render('UserAccount/LikedPost', ['posts' => $posts]);
+    }
+
+
+    /**
+     * User Search
+     */
+    public function search(Request $request):JsonResponse{
+        $query = $request->input('query');
+        $users = User::search($query)->get();
+        return response()->json([
+            'users' => $users
+        ]);
     }
 
     /**
