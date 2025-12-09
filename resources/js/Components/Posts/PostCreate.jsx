@@ -31,7 +31,7 @@ import {
     TriangleAlert,
     BadgeCheck,
     AlertCircleIcon,
-    ArrowLeft
+    ArrowLeft,
 } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { AvatarImage } from "@/components/ui/avatar";
@@ -45,13 +45,23 @@ import { toast } from "sonner";
 import axios from "axios";
 import { useTheme } from "@/src/Context/ThemeContext";
 import useAiGengerateTitle from "../Hooks/useAiGengerateTitle"; // this function does the Ai Title Generate Process
-export default function PostCreate() {
+export default function PostCreate({ setPosts = null  }) {
     const { auth } = usePage().props;
     const { setAi, setOpen } = useTheme();
     const [isMobile, setMobile] = useState(false);
     const blueMarkCheck = auth.user?.bluemark === 1;
     const [isAiErrorMessage, setAiErrorMessage] = useState("");
-    const { data, setData, errors, setError, post, prcessing, isPending } =  useForm({title: "",body: "",});
+    const {
+        data,
+        setData,
+        errors,
+        setError,
+        post,
+        processing,
+        isPending,
+        progress,
+        reset,
+    } = useForm({ title: "", body: "" });
 
     //This is use for resize and depend on the page size
     useEffect(() => {
@@ -67,18 +77,58 @@ export default function PostCreate() {
         return () => window.removeEventListener("resize", checkSize);
     }, []);
 
-
     // This is come From Hooks Folder
-    const aiMutation = useAiGengerateTitle(setAi, setAiErrorMessage);
+    const aiMutation = useAiGengerateTitle(
+        setAi,
+        setAiErrorMessage,
+        setData,
+        setError
+    );
     // Fetch the Ai Generate Title from the backend
     // Create the Post Submit
     const createPostHandler = (e) => {
         e.preventDefault();
-        post(route("post.create"));
-        if (!isMobile) {
-            setOpen(false);
+        if(!isMobile){
+             const fakeData = {
+                    id: Date.now(), // this fake id for a while until real data is reach from databse
+                    title: data.title,
+                    description: data.body,
+                    user_id: auth.user.id,
+                    created_at: new Date().toISOString(), // this fake id for a while until real data is reach from databse
+                    user: {
+                        id: auth.user.id,
+                        username: auth.user.username,
+                        email: auth.user.email,
+                        bluemark: auth.user.bluemark,
+                        avatar_url: auth.user.avatar_url,
+                    },
+                    likes: [],
+                    comments: [],
+                    views: [],
+                    likes_count_formatted: "0", // Blog.jsx needs this!
+                    views_count_formatted: "0", // Blog.jsx needs this!
+                    comments_count_formatted: "0",
+                }
+
+         setPosts((prevPost) =>  [
+                fakeData,
+                ...prevPost,
+            ]
+        );
         }
+        post(route("post.create"), {
+            onSuccess: () => {
+                reset();
+                // ONLY close the modal if the post was successful
+                if (!isMobile) {
+                    setOpen(false);
+                }
+                // Optional: Show a success toast here if you want
+                toast("Post created successfully!");
+            },
+        });
     };
+
     return (
         <form
             onSubmit={createPostHandler}
@@ -89,7 +139,9 @@ export default function PostCreate() {
             <div className="grid flex-1 gap-2">
                 {/* Post User Image and Name */}
                 <div>
-                    <Link href="/home" className="md:hidden" ><ArrowLeft/></Link>
+                    <Link href="/home" className="md:hidden">
+                        <ArrowLeft />
+                    </Link>
                 </div>
 
                 <div className="flex justify-between">

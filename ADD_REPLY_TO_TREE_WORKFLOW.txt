@@ -1,0 +1,202 @@
+ADD_REPLY_TO_TREE.JS — WORKFLOW DOCUMENT
+=========================================
+
+File: `resources/js/Components/Utils/addReplyToTree.js`
+Created: December 10, 2025
+Author: Generated documentation
+
+Purpose
+-------
+Explain exactly how `addReplyToTree(nodes, parentId, comment)` searches a nested comment tree for a given parent id,
+how it inserts the reply, how data flows through recursion, and show a clear step-by-step virtual example you can re-read later.
+
+Function signature
+------------------
+export default function addReplyToTree(nodes, parentId, comment)
+
+Parameters
+- `nodes` (Array): An array of comment objects (the current level of the comment tree).
+    Each node may have a `replies` array containing child comment nodes.
+- `parentId` (Number|String): The id of the comment node you want to attach the `comment` reply to.
+- `comment` (Object): The reply/comment object to insert.
+Expected shape usually includes at least `id` and `parent_id` fields and optionally `replies: []`.
+
+High-level behavior
+-------------------
+1. The function maps over `nodes` and returns a brand new array (immutable update). It never mutates the original `nodes` array or node objects (it spreads `...node`).
+2. For each `node`:
+   a. If `node.id == parentId` → the function returns a new node object with `replies` set to the existing replies plus the new `comment` appended at the end.
+   b. Else if `node.replies` exists and is non-empty → the function recursively calls `addReplyToTree(node.replies, parentId, comment)` and returns a new node with `replies` replaced by the recursive result.
+   c. Otherwise → returns the node unchanged.
+3. Because every `map` returns new node objects (for matched/updated branches) the result is a new tree structure where only the path containing the matched `parentId` is changed — everything else is preserved by reference shape except where copies were created due to spreading.
+
+Why this works (recursion + immutability)
+-----------------------------------------
+- Recursion lets the function search arbitrarily deep levels of nested replies. At each level it either finds the `parentId` or delegates to child level(s).
+- Returning a new array via `map` preserves React-friendly immutability, enabling shallow-equality checks to detect changed nodes and trigger re-renders where needed.
+- The change "bubbles up": the recursive call returns a modified child `replies` array; the parent node receives that modified array and returns a new parent node; that parent array is returned to its parent, etc., until the top-level call returns the fully-updated `nodes` array.
+
+Important implementation details
+-------------------------------
+- The equality uses `==` (`if (node.id == parentId)`) — this allows `parentId` to be number or string and still match, but be aware of potential type coercion issues. Use `===` if types are consistent.
+- The code uses `(node.replies || [])` when appending a reply to ensure a missing `replies` array is handled.
+- If the `parentId` doesn't exist in the tree, the function returns a new array structurally identical to the input.
+
+Time & Space Complexity
+-----------------------
+- Time complexity: O(N) where N is the number of nodes in the tree (worst case the match is not found or is in the last node visited). Every node may be visited once.
+- Space complexity: O(H) for recursion stack (H = tree height). Also returns new arrays/objects for nodes along the visited paths — worst-case you may recreate many node objects.
+
+Edge cases & caveats
+--------------------
+- If `nodes` is empty or `null`, the function returns `[]` (or will error if `nodes` is not an array — caller must pass an array).
+- Using `==` will coerce types (string/number). If you want strict matching, change to `===`.
+- This implementation does not short-circuit the map once it finds the target: it still maps all sibling nodes but only modifies the branch where the parent was found. This is acceptable for moderate trees but can be optimized if needed by returning an object describing whether the match was found.
+- Ensure `comment` includes a `replies` property if you expect it to behave consistently (e.g., `{ id: 10, parent_id: 2, comment: '...', replies: [] }`).
+
+Usage pattern (React example)
+-----------------------------
+When you receive a newly-created reply and want to update UI state safely in React:
+
+    setComments(prev => addReplyToTree(prev, parentId, newReply));
+
+Because `addReplyToTree` returns a new array, React's state setter will detect the change and re-render.
+
+Virtual example (step-by-step trace)
+------------------------------------
+We will trace a full example with comments tree before and after adding a reply.
+
+Input tree (initial `nodes`):
+
+const nodes = [
+  {
+    id: 1,
+    parent_id: null,
+    text: 'Parent A',
+    replies: [
+      {
+        id: 2,
+        parent_id: 1,
+        text: 'Child A1',
+        replies: []
+      }
+    ]
+  },
+  {
+    id: 4,
+    parent_id: null,
+    text: 'Parent B',
+    replies: []
+  }
+];
+
+We want to add `comment = { id: 3, parent_id: 2, text: 'Reply to Child A1', replies: [] }` with `parentId = 2`.
+
+Call: addReplyToTree(nodes, 2, comment)
+
+Top-level execution (level 0):
+- `nodes.map` starts — it will iterate two nodes (id 1 and id 4).
+
+Iteration 1: node.id === 1
+- Check `if (node.id == parentId)` → `1 == 2` → false.
+- Node has `replies` and `replies.length > 0` → true.
+- Recursively call addReplyToTree(node.replies, 2, comment) where node.replies is `[ { id: 2, ... } ]`.
+
+  Recursive level 1 (inside replies of node id 1):
+  - map over the one child node { id:2 }
+
+  Child iteration: node.id === 2
+  - `if (node.id == parentId)` → `2 == 2` → true.
+  - Return new node object: `{ ...node, replies: [...(node.replies || []), comment] }`.
+    At this point `node.replies` was `[]`, so replies becomes `[comment]`.
+  - So the child node returned from recursion becomes:
+    { id:2, parent_id:1, text: 'Child A1', replies: [ { id:3, parent_id:2, text: 'Reply to Child A1', replies: [] } ] }
+
+  - The recursion returns the array `[ <modified-child-node> ]` to the parent level.
+
+- Back to top-level parent node (id:1), it receives the recursive result and returns a new node:
+  `{ ...node, replies: [ <modified-child-node> ] }`.
+
+Iteration 2: node.id === 4
+- `4 == 2` false.
+- `node.replies && node.replies.length > 0` false — just return node unchanged.
+
+After `map` completes at top-level we get the new `nodes` array:
+
+const updated = [
+  {
+    id: 1,
+    parent_id: null,
+    text: 'Parent A',
+    replies: [
+      {
+        id: 2,
+        parent_id: 1,
+        text: 'Child A1',
+        replies: [
+          { id: 3, parent_id: 2, text: 'Reply to Child A1', replies: [] }
+        ]
+      }
+    ]
+  },
+  {
+    id: 4,
+    parent_id: null,
+    text: 'Parent B',
+    replies: []
+  }
+];
+
+Key points in the trace
+- Only the path to `id:2` is modified — we made a new child node and a new parent node (id:1), but node id:4 is returned as-is.
+- The function constructs new objects by spreading (`...node`) to retain immutability.
+- The new comment ends up in the `replies` of the node with id 2.
+
+Alternative implementation notes (optimizations)
+-----------------------------------------------
+If you want to stop traversing siblings once a match is found (early exit) to save work on large trees, you can change the function to return `{ nodes: [...], found: true/false }` from recursive calls and stop mapping siblings when `found` is true. That implementation is more complex but can reduce work when trees are large.
+
+Example skeleton for early-exit (conceptual):
+
+function addReplyToTreeEarly(nodes, parentId, comment) {
+  let found = false;
+  const result = [];
+  for (const node of nodes) {
+    if (found) { result.push(node); continue; }
+    if (node.id == parentId) {
+      result.push({ ...node, replies: [...(node.replies||[]), comment] });
+      found = true;
+      continue;
+    }
+    if (node.replies && node.replies.length) {
+      const { nodes: newReplies, found: childFound } = addReplyToTreeEarly(node.replies, parentId, comment);
+      if (childFound) { found = true; }
+      result.push({ ...node, replies: newReplies });
+      continue;
+    }
+    result.push(node);
+  }
+  return { nodes: result, found };
+}
+
+This prevents work on siblings after the target is located.
+
+Testing checklist (what to verify)
+----------------------------------
+- Works when `parentId` exists at top-level.
+- Works when `parentId` exists at nested child level (depth > 1).
+- Works when `nodes` contains no `replies` properties (function handles undefined replies).
+- Doesn't duplicate comment if called twice with same `comment.id` (guard against duplicates if needed in caller).
+- Types: test with `parentId` as number and string — if strict typing is required, change `==` to `===`.
+- Confirm React re-render when used with `setState`.
+
+Summary (one-liner)
+-------------------
+`addReplyToTree` recursively searches the nested `nodes` array for `parentId`, immutably appends the new `comment` into the `replies` array of the matched node, and returns a new tree where only the path containing the change is recreated.
+
+File created at project root: `ADD_REPLY_TO_TREE_WORKFLOW.txt`
+
+If you want, I can:
+- Convert this to Markdown for better readability.
+- Add a unit test file showing this exact virtual example.
+- Implement an early-exit optimized version and replace the current util (with tests).

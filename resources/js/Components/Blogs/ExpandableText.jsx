@@ -8,10 +8,10 @@ export default function ExpandableText({ blog , viewSumbitHandler }) {
     return (
         <div>
             {isShortText ? (
-                <div  onClick={() => viewSumbitHandler()}>{blog.description}</div>
+                <div  className="text-sm sm:text-md text-gray-700 dark:text-gray-300 text-justify"  onClick={() => viewSumbitHandler()}>{blog.description}</div>
             ) : (
                 <div
-                    className="text-sm sm:text-md text-gray-700 dark:text-gray-300"
+                    className="text-sm sm:text-md text-gray-700 dark:text-gray-300 text-justify"
                     onClick={() => viewSumbitHandler()}
                 >
                     <div
@@ -22,7 +22,6 @@ export default function ExpandableText({ blog , viewSumbitHandler }) {
                             // it function work when user select the text don't run the expand fun
                             // window.getSelection() only return object thing
                             // need to transfer the string so , use the toString()
-
                             const selection = window.getSelection();
                             if (selection.toString().length === 0) {
                                 setExpand(!isExpand);

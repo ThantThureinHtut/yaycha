@@ -14,7 +14,7 @@ export default function ThemeProvider({ children }) {
     const [theme, setTheme] = useState(() => savedTheme || "light");
     const [isAi , setAi] = useState(false);
     const [isOpen , setOpen] = useState(false);
-    const [viewCount , setViewCount] = useState();
+    const [sharePost , setSharePost] = useState();
     // Dark Mode
     const darkMode = (root) => {
         root.classList.add("dark");
@@ -51,7 +51,7 @@ export default function ThemeProvider({ children }) {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <ThemeContext.Provider value={{ theme, setTheme , isAi ,setAi , isOpen , setOpen  }}>
+            <ThemeContext.Provider value={{ theme, setTheme , isAi ,setAi , isOpen , setOpen , sharePost ,  setSharePost }}>
                 {children}
                 <Toaster position="top-center" swipeDirection="up" />
             </ThemeContext.Provider>

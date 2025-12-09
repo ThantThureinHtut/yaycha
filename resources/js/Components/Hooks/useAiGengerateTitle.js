@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import NProgress from "nprogress"; // Import the library
 import "nprogress/nprogress.css";
-export default function useAiGengerateTitle(setAi , setAiErrorMessage ) {
+export default function useAiGengerateTitle(setAi , setAiErrorMessage , setData , setError ) {
     return (useMutation({
         mutationFn: async (bodyText) => {
             if (!bodyText || bodyText.length < 5) {

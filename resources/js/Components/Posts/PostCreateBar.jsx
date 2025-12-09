@@ -54,7 +54,7 @@ import "nprogress/nprogress.css"; // Import the CSS
 import axios from "axios";
 import PostCreate from "./PostCreate";
 import { useTheme } from "@/src/Context/ThemeContext";
-export default function PostCreateBar() {
+export default function PostCreateBar({setPosts}) {
     const [isMobile, setMobile] = useState(false);
     const { auth } = usePage().props;
 
@@ -138,7 +138,9 @@ export default function PostCreateBar() {
                             <Separator />
                         </DialogHeader>
                         {/* This is the Post Create Box Element and Ai Fun work here */}
-                        <PostCreate />
+
+                        {/* setPosts is come from Home page to make the Optimistic UI Update */}
+                        <PostCreate setPosts={setPosts}  />
                     </DialogContent>
                 </Dialog>
             </div>

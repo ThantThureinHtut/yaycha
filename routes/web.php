@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\LikeController;
 use App\Models\Post;
@@ -30,7 +31,7 @@ Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback']
 
 // Home route and Load the posts
 Route::get('/home', function () {
-    $posts = Post::with(['user:id,username,email,bluemark,avatar_url' , 'likes' , 'views', 'comments.user:id,username,bluemark,avatar_url']) // Load user and likes data efficiently
+    $posts = Post::with(['user:id,username,email,bluemark,avatar_url' , 'likes' , 'views']) // Load user and likes data efficiently
     ->withCount(['likes' , 'views' , 'comments']) // Automatically counts likes as 'likes_count'
     ->latest()
     ->get();
@@ -50,17 +51,22 @@ Route::get('/home', function () {
 // User Search Page And Search Route
 Route::get('/search/', function () {
     return Inertia::render('SearchPage');
-});
-Route::post('/search/user/' , [ProfileController::class , 'search'] )->name('user.search');
+})->middleware('auth');
+Route::post('/search/user/' , [ProfileController::class , 'search'] )->name('user.search')->middleware('auth');
 
 
 // All Post Feature , Post , Like , Comment
 Route::group(['prefix' => '/post' , 'middleware' => 'auth'], function () {
     Route::get('/post_dashboard/', [PostController::class, 'index'])->name('post.dashboard');
     Route::post('/post_create', [PostController::class, 'post'])->name('post.create');
+
+    // Post Veiw , Like , Comment
     Route::get('/post_views'  , [ViewController::class , 'index'])->name('post.view');
     Route::post('/post/views/store'  , [ViewController::class , 'store'])->name('post.viewStore');
     Route::post('/post/like/store' , [LikeController::class , 'store'])->name('post.likeStore');
+    Route::get('/post/{id}/comments' , [CommentController::class , 'index'])->name('post.comments.dashboard');
+    Route::post('/post/comments' , [CommentController::class , 'store'])->name('post.comments.store');
+    // AI generate-title
     Route::post('/generate-title', [PostController::class, 'generateTitle'])
         ->name('post.generate-title')
         ->middleware('auth');

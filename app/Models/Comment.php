@@ -6,17 +6,34 @@ use Illuminate\Database\Eloquent\Model;
 
 class Comment extends Model
 {
-    protected $fillable =[
-        'id' ,
+    protected $fillable = [
+        'id',
         'post_id',
-        'reply_user_id',
+        'parent_id',
         'user_id',
-        'comment'
+        'comment',
+        'created_at',
+        'updated_at'
     ];
-    public function user(){
-        return $this->belongsTo(User::class);
+
+    // 1. The "Children" (Replies)
+    // "Go find other comments that have MY ID in their parent_id column"
+    public function replies()
+    {
+        return $this->hasMany(Comment::class, 'parent_id')
+                    ->with('user:id,username,avatar_url')
+                    ->with('replies.parent.user:id,username')
+                    ->with('replies');
     }
-    public function post(){
-        return $this->belongsTo(Post::class);
+
+    // 2. The "Parent" (The comment I replied to)
+    // "Look at my parent_id column, and go find that comment"
+    public function parent()
+    {
+        return $this->belongsTo(Comment::class, 'parent_id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

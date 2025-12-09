@@ -51,7 +51,7 @@ class RegisteredUserController extends Controller
             'Wyatt',
             'Kimberly'
         ];
-        $avatar = $avatar_name[rand(0, 13)];
+        $avatar = $avatar_name[rand(0, 12)];
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,

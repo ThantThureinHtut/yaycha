@@ -1,6 +1,7 @@
 import { router, usePage } from "@inertiajs/react";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import formatNumber from "../Utils/formatNumber";
 export default function usePostEcho(setPosts, filterUserId = null) {
     const { auth } = usePage().props;
     let channel = null;
@@ -10,12 +11,6 @@ export default function usePostEcho(setPosts, filterUserId = null) {
     let followChannelName = null;
     let likeChannelNmae = null;
 
-    const formatNumber = (num) => {
-        return new Intl.NumberFormat("en-US", {
-            notation: "compact",
-            compactDisplay: "short",
-        }).format(num);
-    };
     useEffect(() => {
         // 1. Connect ONCE
         if (filterUserId) {

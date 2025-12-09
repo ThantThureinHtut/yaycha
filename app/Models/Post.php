@@ -47,7 +47,6 @@ class Post extends Model
         );
     }
 
-
     // Laravel model relational
     public function user()
     {

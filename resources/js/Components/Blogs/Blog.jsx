@@ -27,67 +27,16 @@ import { Link, useForm, usePage } from "@inertiajs/react";
 import { useState } from "react";
 import ExpandableText from "./ExpandableText";
 import axios from "axios";
-import { useMutation } from "@tanstack/react-query";
+
 import { Button } from "../ui/button";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { set } from "nprogress";
-
+import formatNumber from "../Utils/formatNumber";
+import usePostInteractions from "../Hooks/usePostInteractions";
 export default function Blog({ post }) {
-
     const { auth } = usePage().props;
     const [isPressed, setPressed] = useState(post.likes.some((like) => like.post_id === post.id && like.like_id === auth.user.id));
-       const formatNumber = (number) => {
-        return new Intl.NumberFormat("en-US", {
-            notation: "compact",
-            compactDisplay: "short",
-        }).format(number);
-    };
-
-    const viewIn = useMutation({
-        mutationFn: () => {
-            axios.post(route("post.viewStore"), {
-                user_id: auth.user.id,
-                post_id: post.id,
-            });
-        },
-        onMutate: async () => {
-            post.views_count += 1;
-            post.views_count_formatted = formatNumber(post.views_count);
-            // This need !! cuz in viewSumbitHandller , checking the view.user_id === auth.user.id
-            // but when you click again and again before Echo is finish. So the views value is still null ,The Count is increasing
-            // so need to put views value for perevent that action but that data is temp , not autaul data to sign in
-            // so in post data , in user one {post_id: 1 , user_id: 2} but in user two two which come from database value
-            // but when you refresh your page it become autaul data which is come from database;
-
-            // Example ->
-            //  user click -> increase view Count(virtual data) (1)
-            //  user click again before loading is finish -> increase (1)->(2)->(3)
-            //  when loading is finish , view count become (1) in your userinterface (which is bed UX)
-            //  so add the temporary data to prevent that kind of thing which i related my if check
-
-            // Remining This prevent the increaing the viewcount for temporary
-            post.views = [
-                ...(post.views || []),
-                { post_id: post.id, user_id: auth.user.id },
-            ];
-        },
-    });
-
-    const likeIn = useMutation({
-        mutationFn: () => {
-         axios.post(route("post.likeStore"), {
-                like_id: auth.user.id,
-                user_id : post.user_id,
-                post_id: post.id,
-            });
-        },
-        onMutate:  () => {
-            setPressed((prev) => !prev);
-            isPressed ? post.likes_count -= 1 : post.likes_count += 1;
-            post.likes_count_formatted = formatNumber(post.likes_count);
-        },
-    });
-
+    const { viewIn, likeIn } = usePostInteractions(post, auth, isPressed, setPressed);
 
 
     const viewSumbitHandler = () => {
@@ -145,7 +94,7 @@ export default function Blog({ post }) {
                                                 @{post.user.username}
                                             </span>
                                         </b>
-                                        {post.bluemark === 1 && <BlueMark />}
+                                        {post.user.bluemark === 1 && <BlueMark />}
                                     </span>
                                 </CardDescription>
                             </div>
@@ -181,10 +130,10 @@ export default function Blog({ post }) {
                                     </div>
                                 </li>
                                 <li>
-                                    <span className="flex items-center gap-1">
+                                    <Link href={route('post.comments.dashboard' , {id: post.id})} className="flex items-center gap-1" >
                                         {post.comments_count_formatted}
                                         <MessageSquare size={20} />
-                                    </span>
+                                    </Link>
                                 </li>
                             </ul>
                         </CardContent>
