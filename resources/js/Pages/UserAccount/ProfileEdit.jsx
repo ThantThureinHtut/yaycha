@@ -41,6 +41,7 @@ export default function ProfileEdit() {
         name: auth.user?.name,
         email: auth.user?.email,
         password: "",
+        bio: auth.user?.bio
     });
 
     useEffect(() => {
@@ -95,6 +96,16 @@ export default function ProfileEdit() {
                     </CardHeader>
                     <CardContent>
                         <div className="flex flex-col gap-3">
+                             <InputGroup>
+                                <InputGroupInput
+                                    value={data?.bio ?? ''}
+                                    onChange={(e) =>
+                                        setData("bio", e.target.value)
+                                    }
+                                />
+                                <InputGroupAddon>Bio</InputGroupAddon>
+                            </InputGroup>
+
                             <InputGroup>
                                 <InputGroupInput
                                     value={data.name}

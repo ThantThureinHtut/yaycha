@@ -23,7 +23,7 @@ class ProfileController extends Controller
      */
     public function account()
     {
-        $posts =  Post::with(['user:id,username,email,bluemark,avatar_url', 'likes.user:id,username,bluemark,avatar_url', 'views', 'comments.user:id,username,bluemark,avatar_url']) // Load user and likes data efficiently
+        $posts =  Post::with(['user:id,username,email,avatar_url,bio', 'likes.user:id,username,avatar_url,bio', 'views', 'comments.user:id,username,avatar_url,bio']) // Load user and likes data efficiently
             ->where('user_id', Auth::user()->id)
             ->withCount(['likes', 'views', 'comments']) // Automatically counts likes as 'likes_count'
             ->latest()
@@ -48,7 +48,7 @@ class ProfileController extends Controller
     {
 
         $id = request()->query('id');
-        $posts = Post::with(['user:id,username,email,bluemark,avatar_url', 'likes', 'views', 'comments.user:id,username,bluemark,avatar_url']) // Load user and likes data efficiently
+        $posts = Post::with(['user:id,username,email,avatar_url,bio', 'likes', 'views', 'comments.user:id,username,avatar_url,bio']) // Load user and likes data efficiently
             ->where('user_id' , $id)
             ->withCount(['likes', 'views', 'comments']) // Automatically counts likes as 'likes_count'
             ->latest()
@@ -57,12 +57,14 @@ class ProfileController extends Controller
         $followingUser = User::where('id', $id)->withCount(['followers', 'followings'])->first();
         $followingUser->load([
             'followers',
-            'followings'
+            'followings',
+            'bluemark'
         ]);
         $user = User::where('id', Auth::user()->id)->withCount(['followers', 'followings'])->first();
         $user->load([
             'followers',
-            'followings'
+            'followings',
+            'bluemark'
         ]);
 
         return Inertia::render('UserAccount/ProfileShow', [
@@ -87,13 +89,13 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
 
+        $request->user()->fill($request->validated());
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
 
-        $request->user()->save();
+       $request->user()->save();
 
         return Redirect::route('account.edit');
     }
@@ -105,12 +107,10 @@ class ProfileController extends Controller
 
     public function liked_show():Response
     {
-           $posts = Auth::user()->likedPosts()->with(['user:id,username,email,bluemark,avatar_url' , 'likes' , 'views']) // Load the author of the post
+           $posts = Auth::user()->likedPosts()->with(['user:id,username,email,avatar_url' , 'likes' , 'views']) // Load the author of the post
             ->withCount(['likes', 'views', 'comments'])
             ->latest() // Sort by when I liked them!
             ->get();
-
-        logger($posts->toArray());
         return Inertia::render('UserAccount/LikedPost', ['posts' => $posts]);
     }
 

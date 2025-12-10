@@ -41,7 +41,7 @@ class PostCreatedEvent implements ShouldBroadcast
     {
        // 1. Re-Load Relationships (Worker needs this)
     $this->post->load([
-        'user:id,username,email,bluemark,avatar_url',
+        'user:id,username,email,avatar_url',
         'likes',
         'comments',
         'views',

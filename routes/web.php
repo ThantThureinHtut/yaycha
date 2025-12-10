@@ -31,14 +31,15 @@ Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback']
 
 // Home route and Load the posts
 Route::get('/home', function () {
-    $posts = Post::with(['user:id,username,email,bluemark,avatar_url' , 'likes' , 'views']) // Load user and likes data efficiently
+    $posts = Post::with(['user:id,username,email,avatar_url' , 'likes' , 'views']) // Load user and likes data efficiently
     ->withCount(['likes' , 'views' , 'comments']) // Automatically counts likes as 'likes_count'
     ->latest()
     ->get();
     $user = User::where('id', Auth::user()->id)->withCount(['followers', 'followings'])->first();
     $user->load([
         'followers',
-        'followings'
+        'followings',
+        'bluemark'
     ]);
     return Inertia::render('Home', [
         'posts' => $posts,

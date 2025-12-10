@@ -12,7 +12,7 @@ class CommentController extends Controller
 {
     public function index($id)
     {
-        $post = Post::with(['user:id,username,email,bluemark,avatar_url', 'likes', 'views', 'comments.user:id,username,bluemark,avatar_url']) // Load user and likes data efficiently
+        $post = Post::with(['user:id,username,email,avatar_url', 'likes', 'views', 'comments.user:id,username,avatar_url']) // Load user and likes data efficiently
             ->where('id' , $id)
             ->withCount(['likes', 'views', 'comments']) // Automatically counts likes as 'likes_count'
             ->first();

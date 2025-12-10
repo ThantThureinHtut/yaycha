@@ -26,6 +26,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'bio',
         'username',
         'avatar_url',
         'provider_method',
@@ -39,7 +40,8 @@ class User extends Authenticatable
     protected $appends = [
         'has_password',
         'followers_count_formatted',
-        'followings_count_formatted'
+        'followings_count_formatted',
+        'bluemark_boolean'
     ];
     /**
      * The attributes that should be hidden for serialization.
@@ -113,8 +115,17 @@ class User extends Authenticatable
             }
         );
     }
-
-
+    protected function bluemarkBoolean():Attribute{
+        return Attribute::make(
+            get: function () {
+                 $this->load('bluemark');
+                 return isset($this->bluemark);
+            }
+        );
+    }
+     public function bluemark(){
+        return $this->belongsTo(Bluemark::class , 'id');
+    }
     public function posts()
     {
         return $this->hasMany(Post::class);
@@ -170,6 +181,7 @@ class User extends Authenticatable
         // "I am the follower_id, give me the people in the user_id column"
         return $this->belongsToMany(User::class, 'follows', 'follower_id', 'user_id');
     }
+
 
 
 }

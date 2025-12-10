@@ -27,9 +27,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import addReplyToTree from "@/Components/Utils/addReplyToTree";
 import usePostInteractions from "@/Components/Hooks/usePostInteractions";
+import usePostEcho from "@/Components/Hooks/usePostEcho";
 
-export default function CommentPage({ post, comments }) {
+export default function CommentPage({ post: initialPost, comments }) {
     const { auth } = usePage().props;
+    const [ post, setPost] = useState(initialPost)
     const [isPressed, setPressed] = useState(
         post.likes.some(
             (like) => like.post_id === post.id && like.like_id === auth.user.id
@@ -129,6 +131,8 @@ export default function CommentPage({ post, comments }) {
             setComment("");
         }
     };
+
+    usePostEcho(setPost)
     return (
         <div className="container mx-auto md:w-full lg:w-1/2 px-3 relative">
             <div className="sticky top-0 bg-background rounded-b z-50 ">

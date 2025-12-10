@@ -18,13 +18,14 @@ import { Link, usePage } from "@inertiajs/react";
 import { ArrowLeft, Edit } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import BlueMark from "@/Components/BlueMark";
 
-export default function AccountInformation({ posts: initialPosts}) {
+export default function AccountInformation({ posts: initialPosts }) {
     const [posts, setPosts] = useState(initialPosts);
     const { auth } = usePage().props;
-    const [ user , setUser] =  useState(auth.user);
+    const [user, setUser] = useState(auth.user);
 
-    usePostEcho(setPosts , user.id);
+    usePostEcho(setPosts, user.id);
     return (
         <div className="container mx-auto">
             <div className="hidden sm:block">
@@ -49,25 +50,36 @@ export default function AccountInformation({ posts: initialPosts}) {
                                     </Avatar>
                                     <div>
                                         <CardTitle className="text-xl sm:text-2xl">
-                                            <div className="flex items-center gap-3">
-                                                <span>@{auth.user?.username}</span>
-
+                                            <div className="flex items-center gap-2">
+                                                <span>
+                                                    @{auth.user?.username}
+                                                </span>
+                                                {auth.user
+                                                    ?.bluemark_boolean && (
+                                                    <BlueMark />
+                                                )}
                                             </div>
                                         </CardTitle>
                                         <CardDescription className="text-sm sm:text-md">
-                                            <div className="flex items-center gap-2">
-                                                <span>
-                                                    {user.followers_count ||
-                                                        0}{" "}
-                                                    followers
-                                                </span>
-                                                <Separator orientation="vertical" className="h-4" />
-                                                <span>
-                                                    {auth.user
-                                                        ?.followings_count ||
-                                                        0}{" "}
-                                                    followings
-                                                </span>
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <span>
+                                                        {user.followers_count ||
+                                                            0}{" "}
+                                                        followers
+                                                    </span>
+                                                    <Separator
+                                                        orientation="vertical"
+                                                        className="h-4"
+                                                    />
+                                                    <span>
+                                                        {auth.user
+                                                            ?.followings_count ||
+                                                            0}{" "}
+                                                        followings
+                                                    </span>
+                                                </div>
+                                                <div>{auth.user?.bio}</div>
                                             </div>
                                         </CardDescription>
                                     </div>

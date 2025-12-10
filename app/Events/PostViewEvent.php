@@ -40,7 +40,7 @@ class PostViewEvent implements ShouldBroadcast
         ];
     }
     public function broadcastWith():array {
-        $this->view->load('user:id,username,email,bluemark,avatar_url');
+        $this->view->load('user:id,username,email,avatar_url');
 
         return [
             'view' => $this->view->toArray(),

@@ -94,7 +94,7 @@ export default function Header() {
                                         </div>
                                     </DrawerTitle>
                                     <DrawerDescription className="flex items-center justify-center">
-                                        Bio
+                                        {auth.user?.bio ?? "Bio"}
                                     </DrawerDescription>
                                 </DrawerHeader>
                                 <Separator className="my-2 " />

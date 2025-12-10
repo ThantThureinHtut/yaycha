@@ -94,7 +94,7 @@ export default function Blog({ post }) {
                                                 @{post.user.username}
                                             </span>
                                         </b>
-                                        {post.user.bluemark === 1 && <BlueMark />}
+                                        {post.user.bluemark_boolean === true && <BlueMark />}
                                     </span>
                                 </CardDescription>
                             </div>

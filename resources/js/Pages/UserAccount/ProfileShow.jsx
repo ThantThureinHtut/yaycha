@@ -18,34 +18,42 @@ import { Link, usePage } from "@inertiajs/react";
 import { ArrowLeft, Edit } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import BlueMark from "@/Components/BlueMark";
 
-export default function AccountInformation({ posts: initialPosts , followingUser = null}) {
+export default function AccountInformation({
+    posts: initialPosts,
+    followingUser = null,
+}) {
     const [posts, setPosts] = useState(initialPosts);
     const { auth } = usePage().props;
 
     // Is Follow State
-    const [isFollow , setIsFollow] = useState(() => {
-        return auth.user.followings.some(following => following.id === followingUser.id)
+    const [isFollow, setIsFollow] = useState(() => {
+        return auth.user.followings.some(
+            (following) => following.id === followingUser.id
+        );
     });
 
     // Post Echo for Realtime Update
-   usePostEcho(setPosts);
+    usePostEcho(setPosts);
 
     // Follow Unfollow Mutation
-   const followingMutation = useMutation({
+    const followingMutation = useMutation({
         mutationFn: () => {
-             return axios.post(route('account.follow.store' , followingUser.id))
+            return axios.post(route("account.follow.store", followingUser.id));
         },
         onMutate: () => {
             setIsFollow((prev) => !prev);
-        }
-    })
+        },
+    });
 
     // Follow Unfollow Submit Handler
-     const followSubmitHandler =  () => {
-        followingUser.followers_count = isFollow ? followingUser.followers_count - 1 : followingUser.followers_count + 1;
+    const followSubmitHandler = () => {
+        followingUser.followers_count = isFollow
+            ? followingUser.followers_count - 1
+            : followingUser.followers_count + 1;
         followingMutation.mutate();
-    }
+    };
 
     return (
         <div className="container mx-auto">
@@ -71,30 +79,57 @@ export default function AccountInformation({ posts: initialPosts , followingUser
                                     </Avatar>
                                     <div>
                                         <CardTitle className="text-xl sm:text-2xl">
-                                            <div className="flex items-center gap-3">
-                                                <span>@{followingUser?.username}</span>
-                                                <Button variant={isFollow ? 'outline' : 'default'} onClick={followSubmitHandler} >{isFollow ? 'Unfollow' : 'Follow'}</Button>
+                                            <div className="flex items-center gap-5">
+                                                <div className="flex items-center gap-2">
+                                                    <span>
+                                                        @
+                                                        {
+                                                            followingUser?.username
+                                                        }
+                                                    </span>
+                                                    {followingUser?.bluemark_boolean && (
+                                                        <BlueMark />
+                                                    )}
+                                                </div>
+                                                <Button
+                                                    variant={
+                                                        isFollow
+                                                            ? "outline"
+                                                            : "default"
+                                                    }
+                                                    onClick={
+                                                        followSubmitHandler
+                                                    }
+                                                >
+                                                    {isFollow
+                                                        ? "Unfollow"
+                                                        : "Follow"}
+                                                </Button>
                                             </div>
                                         </CardTitle>
                                         <CardDescription className="text-sm sm:text-md">
-                                            <div className="flex items-center gap-2">
-                                                <span>
-                                                    {followingUser.followers_count ||
-                                                        0}{" "}
-                                                    followers
-                                                </span>
-                                                <Separator orientation="vertical" className="h-4" />
-                                                <span>
-                                                    {followingUser
-                                                        ?.followings_count ||
-                                                        0}{" "}
-                                                    followings
-                                                </span>
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <span>
+                                                        {followingUser.followers_count ||
+                                                            0}{" "}
+                                                        followers
+                                                    </span>
+                                                    <Separator
+                                                        orientation="vertical"
+                                                        className="h-4"
+                                                    />
+                                                    <span>
+                                                        {followingUser?.followings_count ||
+                                                            0}{" "}
+                                                        followings
+                                                    </span>
+                                                </div>
+                                                <div>{followingUser?.bio}</div>
                                             </div>
                                         </CardDescription>
                                     </div>
                                 </div>
-
                             </div>
                         </CardHeader>
                         <Separator className="mb-8" />
