@@ -37,8 +37,6 @@ export default function Blog({ post }) {
     const { auth } = usePage().props;
     const [isPressed, setPressed] = useState(post.likes.some((like) => like.post_id === post.id && like.like_id === auth.user.id));
     const { viewIn, likeIn } = usePostInteractions(post, auth, isPressed, setPressed);
-
-
     const viewSumbitHandler = () => {
         // check , if the user is exist , don't increase the view count
         // if not increae the count
@@ -54,8 +52,8 @@ export default function Blog({ post }) {
         viewSumbitHandler()
     }
     return (
-        <div className="container flex flex-col gap-8 mx-auto my-3  md:w-full lg:w-1/2  ">
-            <Card className="rounded-none">
+        <div className="container flex flex-col gap-8 mx-auto my-3  md:w-full lg:w-1/2">
+            <Card  className="rounded-none md:rounded-xl">
                 <CardHeader>
                     <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
@@ -87,8 +85,8 @@ export default function Blog({ post }) {
                             <div>
                                 <CardTitle>{post.title}</CardTitle>
                                 <CardDescription className="flex justify-between">
-                                    <span className="flex items-center gap-2">
-                                        written by{" "}
+                                    <span className="flex items-center gap-2 text-xs sm:text-base">
+                                        <div> written by{" "}</div>
                                         <b className="flex items-center gap-2">
                                             <span className="text-blue-500">
                                                 @{post.user.username}

@@ -69,8 +69,8 @@ export default function SearchBox() {
                         {users &&
                         users.map((user) => (
                             <div key={user.id}>
-                                <Link href={user.id !== auth.user.id ? route("account.show" , {id: user.id}) : route("account.dashboard") }>
-                                    <Item variant="outline">
+                                <Link href={user.id !== auth.user.id ? route("account.show" , {id: user.id}) : route("account.dashboard") } >
+                                    <Item variant="outline" className="hover:bg-slate-300/10">
                                         <ItemMedia />
                                         <ItemContent>
                                             <div className="flex gap-3 items-center">

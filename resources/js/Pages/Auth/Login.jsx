@@ -9,11 +9,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import {
-    AlertCircleIcon,
-    CheckCircle2Icon,
-    PopcornIcon,
-} from "lucide-react";
+import { AlertCircleIcon, CheckCircle2Icon, PopcornIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -31,10 +27,10 @@ export default function Login() {
             onSuccess: () => reset(),
         });
     };
-    const emailError = errors.email || pageErrors.email;
+    // Add the '?' before the dot
+    const emailError = errors.email || pageErrors?.email;
     return (
         <AuthLayout>
-
             <TabsContent value="login">
                 <Card className="w-full max-w-sm">
                     <CardHeader>
@@ -115,7 +111,7 @@ export default function Login() {
                         >
                             Login
                         </Button>
-                        <OAuthButtons/>
+                        <OAuthButtons />
                     </CardFooter>
                 </Card>
             </TabsContent>

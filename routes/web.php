@@ -1,18 +1,27 @@
 <?php
 
-use App\Http\Controllers\CommentController;
-use App\Http\Controllers\FollowController;
-use App\Http\Controllers\LikeController;
+use App\Http\Controllers\Admin\AdminAllUserController;
 use App\Models\Post;
 use App\Models\User;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PostController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\ViewController;
+use App\Http\Controllers\FollowController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\BluemarkController;
+use App\Http\Controllers\SocialiteController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AdminSettingsController;
+use App\Http\Controllers\Admin\AdminVerificationsController;
+use App\Http\Controllers\VerifiedAccountInfoController;
+use App\Models\Bluemark;
+use App\Models\VerifiedAccountInfo;
 
 // Route::get('/', function () {
 //     return Inertia::render('Welcome', [
@@ -31,42 +40,43 @@ Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback']
 
 // Home route and Load the posts
 Route::get('/home', function () {
-    $posts = Post::with(['user:id,username,email,avatar_url' , 'likes' , 'views']) // Load user and likes data efficiently
-    ->withCount(['likes' , 'views' , 'comments']) // Automatically counts likes as 'likes_count'
-    ->latest()
-    ->get();
+    $posts = Post::with(['user:id,username,email,avatar_url', 'likes', 'views']) // Load user and likes data efficiently
+        ->withCount(['likes', 'views', 'comments']) // Automatically counts likes as 'likes_count'
+        ->latest()
+        ->get();
     $user = User::where('id', Auth::user()->id)->withCount(['followers', 'followings'])->first();
     $user->load([
         'followers',
         'followings',
-        'bluemark'
+        'bluemark',
+        'verifiedacountinfo'
     ]);
     return Inertia::render('Home', [
         'posts' => $posts,
         'auth' => [
-           'user' => $user
+            'user' => $user
         ]
     ]);
 })->middleware(['auth', 'verified'])->name('home');
 
 // User Search Page And Search Route
 Route::get('/search/', function () {
-    return Inertia::render('SearchPage');
+    return Inertia::render('User/SearchPage');
 })->middleware('auth');
-Route::post('/search/user/' , [ProfileController::class , 'search'] )->name('user.search')->middleware('auth');
+Route::post('/search/user/', [ProfileController::class, 'search'])->name('user.search')->middleware('auth');
 
 
 // All Post Feature , Post , Like , Comment
-Route::group(['prefix' => '/post' , 'middleware' => 'auth'], function () {
+Route::group(['prefix' => '/post', 'middleware' => 'auth'], function () {
     Route::get('/post_dashboard/', [PostController::class, 'index'])->name('post.dashboard');
     Route::post('/post_create', [PostController::class, 'post'])->name('post.create');
 
     // Post Veiw , Like , Comment
-    Route::get('/post_views'  , [ViewController::class , 'index'])->name('post.view');
-    Route::post('/post/views/store'  , [ViewController::class , 'store'])->name('post.viewStore');
-    Route::post('/post/like/store' , [LikeController::class , 'store'])->name('post.likeStore');
-    Route::get('/post/{id}/comments' , [CommentController::class , 'index'])->name('post.comments.dashboard');
-    Route::post('/post/comments' , [CommentController::class , 'store'])->name('post.comments.store');
+    Route::get('/post_views', [ViewController::class, 'index'])->name('post.view');
+    Route::post('/post/views/store', [ViewController::class, 'store'])->name('post.viewStore');
+    Route::post('/post/like/store', [LikeController::class, 'store'])->name('post.likeStore');
+    Route::get('/post/{id}/comments', [CommentController::class, 'index'])->name('post.comments.dashboard');
+    Route::post('/post/comments', [CommentController::class, 'store'])->name('post.comments.store');
     // AI generate-title
     Route::post('/generate-title', [PostController::class, 'generateTitle'])
         ->name('post.generate-title')
@@ -74,19 +84,41 @@ Route::group(['prefix' => '/post' , 'middleware' => 'auth'], function () {
 });
 
 
-Route::group(['prefix' => '/account/' , 'middleware' => 'auth'], function () {
+Route::group(['prefix' => '/account/', 'middleware' => 'auth'], function () {
     Route::get('/', [ProfileController::class, 'account'])->name('account.dashboard');
-    Route::get('/profile.php' , [ProfileController::class , 'show'])->name('account.show');
-    Route::get('/follow/' , [FollowController::class , 'index'])->name('account.follow');
-    Route::post('/follow/{id}' ,[FollowController::class , 'store'])->name('account.follow.store');
-    Route::get('/liked/posts' , [ProfileController::class , 'liked_show'])->name('acccount.liked.posts.show');
+    Route::get('/profile.php', [ProfileController::class, 'show'])->name('account.show');
+
+    // Follow
+    Route::get('/follow/', [FollowController::class, 'index'])->name('account.follow');
+    Route::post('/follow/{id}', [FollowController::class, 'store'])->name('account.follow.store');
+
+    // Liked Posts
+    Route::get('/liked/posts', [ProfileController::class, 'liked_show'])->name('acccount.liked.posts.show');
+
+    // Profile Edit
     Route::group(['prefix' => '/profile_edit'], function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('account.edit');
         Route::post('/update', [ProfileController::class, 'update'])->name('profile.edit');
         Route::post("/delete", [ProfileController::class, 'destory'])->name('account.delete');
     });
+
+    // Verified Account
+    Route::get('/{id}/bluemark/verified', [BluemarkController::class, 'index'])->name('account.bluemark.verified.dashboard');
+    Route::post('/bluemark/verified', [VerifiedAccountInfoController::class, 'store'])->name("account.bluemark.verified.store");
+    Route::post('/blumark/verified/update_status' , [VerifiedAccountInfoController::class , 'update'])->name("account.bluemark.verified.update");
 });
 
 
+
+// Admin Dashboard
+// // Admin Routes (Protected)
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+
+    Route::get('/dashboard', [AdminController::class , 'index'])->name('dashboard');
+    Route::get("/verifications", [AdminVerificationsController::class, 'verifications'])->name('verifications');
+    Route::get("/settings", [AdminSettingsController::class, 'settings'])->name('settings');
+    Route::get("/all_users", [AdminAllUserController::class, 'user_check'])->name('allUser');
+
+});
 
 require __DIR__ . '/auth.php';

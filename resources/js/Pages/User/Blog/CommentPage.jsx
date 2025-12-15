@@ -27,7 +27,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import addReplyToTree from "@/Components/Utils/addReplyToTree";
 import usePostInteractions from "@/Components/Hooks/usePostInteractions";
-import usePostEcho from "@/Components/Hooks/usePostEcho";
+import usePostEcho from "@/Components/Hooks/usePostEcho.jsx";
 
 export default function CommentPage({ post: initialPost, comments }) {
     const { auth } = usePage().props;
@@ -163,7 +163,7 @@ export default function CommentPage({ post: initialPost, comments }) {
                 </div>
             </div>
 
-            <div className="px-1  text-justify" onClick={viewSumbitHandler}>
+            <div className="px-1  text-justify whitespace-pre-wrap" onClick={viewSumbitHandler}>
                 {post.description}
             </div>
 

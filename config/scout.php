@@ -143,7 +143,9 @@ return [
         'key' => env('MEILISEARCH_KEY'),
         'index-settings' => [
             User::class => [
-                'searchableAttributes' => ['id', 'name', 'email' , 'username'],
+                'sortableAttributes' => [ 'name' ,'username', 'created_at', 'id'],
+                'filterableAttributes' => ['verified_status', 'provider_method'],
+                'searchableAttributes' => ['name' , 'email' ,'username'],
             ],
         ],
     ],

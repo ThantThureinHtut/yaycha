@@ -1,6 +1,6 @@
 import Blog from "@/Components/Blogs/Blog";
 import Header from "@/Components/Header";
-import usePostEcho from "@/Components/Hooks/usePostEcho";
+import usePostEcho from "@/Components/Hooks/usePostEcho.jsx";
 import PostCreateBox from "@/Components/Posts/PostCreateBar";
 import { Avatar, AvatarImage } from "@/Components/ui/avatar";
 import { Button } from "@/Components/ui/button";

@@ -48,8 +48,9 @@ import useAiGengerateTitle from "../Hooks/useAiGengerateTitle"; // this function
 export default function PostCreate({ setPosts = null  }) {
     const { auth } = usePage().props;
     const { setAi, setOpen } = useTheme();
+
     const [isMobile, setMobile] = useState(false);
-    const blueMarkCheck = auth.user?.bluemark === 1;
+    const blueMarkCheck = auth.user?.bluemark_boolean === true;
     const [isAiErrorMessage, setAiErrorMessage] = useState("");
     const {
         data,
@@ -262,7 +263,7 @@ export default function PostCreate({ setPosts = null  }) {
                                             Cancel
                                         </AlertDialogCancel>
                                         <AlertDialogAction className="bg-blue-500 text-white hover:bg-blue-600">
-                                            verified now
+                                            <Link href={route("account.bluemark.verified.dashboard" , {id: auth.user.id})}>verified now</Link>
                                         </AlertDialogAction>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>

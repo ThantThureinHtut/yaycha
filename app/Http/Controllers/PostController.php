@@ -14,7 +14,7 @@ class PostController extends Controller
 {
     public function index()
     {
-        return Inertia::render(("Blog/PostCreatePage"));
+        return Inertia::render(("User/Blog/PostCreatePage"));
     }
     public function post(Request $request)
     {

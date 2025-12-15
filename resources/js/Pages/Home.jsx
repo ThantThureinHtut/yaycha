@@ -3,9 +3,9 @@ import { Link, useForm, usePage } from "@inertiajs/react";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { useTheme } from "@/src/Context/ThemeContext";
 import Blog from "@/Components/Blogs/Blog";
-import usePostEcho from "@/Components/Hooks/usePostEcho";
+import usePostEcho from "@/Components/Hooks/usePostEcho.jsx";
 import PostCreateBar from "@/Components/Posts/PostCreateBar";
-import PostCreatePage from "./Blog/PostCreatePage";
+import PostCreatePage from "./User/Blog/PostCreatePage";
 export default function Home({ posts: initialPosts }) {
     const [posts, setPosts] = useState(initialPosts);
 

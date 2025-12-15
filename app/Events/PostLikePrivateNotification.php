@@ -47,6 +47,7 @@ class PostLikePrivateNotification implements ShouldBroadcast
             'email' => $this->currentUser->email,
             'userId' => $this->currentUser->id,
             'postId' => $this->postId,
+            'avatar_url' => $this->currentUser->avatar_url
         ];
     }
 }

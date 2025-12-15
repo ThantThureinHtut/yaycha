@@ -27,6 +27,8 @@ import {
     Eclipse,
     LogOut,
     Search,
+    ShieldUser,
+    Verified,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -39,16 +41,15 @@ import { useEffect, useState } from "react";
 import { useTheme } from "@/src/Context/ThemeContext";
 import SearchBox from "@/components/SearchBox";
 export default function Header() {
-    const {auth} = usePage().props
+    const { auth } = usePage().props;
     const { theme, setTheme } = useTheme();
     return (
-        <div className="container mx-auto">
+        <div className="container mx-auto ">
             <ul className="flex items-center justify-between shadow-sm dark:shadow-md py-3 px-6 rounded-sm">
                 <li>
                     <Link href="/home">
-                          <Rabbit size={35} color="#facc13" />
+                        <Rabbit size={35} color="#facc13" />
                     </Link>
-
                 </li>
                 <li className="hidden md:block sm:w-1/2">
                     <div className="flex justify-center items-center ">
@@ -57,7 +58,9 @@ export default function Header() {
                 </li>
                 <li>
                     <div className="flex items-center gap-6">
-                        <Link href="/search/" className="md:hidden"><Search /></Link>
+                        <Link href="/search/" className="md:hidden">
+                            <Search />
+                        </Link>
                         {/* Clicked to show the drawer */}
                         <Drawer direction="right">
                             <DrawerTrigger asChild>
@@ -70,7 +73,7 @@ export default function Header() {
                             </DrawerTrigger>
 
                             {/* Show up the Drawer Container */}
-                            <DrawerContent className="right-0 left-auto w-full sm:w-80  h-full rounded-none">
+                            <DrawerContent className="right-0 left-auto w-full sm:w-80 rounded-none h-full min-h-screen overflow-scroll overflow-x-hidden">
                                 <DrawerHeader>
                                     {/* Drawer Close Button */}
                                     <DrawerClose asChild>
@@ -88,7 +91,6 @@ export default function Header() {
                                                 <AvatarImage
                                                     src={auth.user?.avatar_url}
                                                 />
-
                                             </Avatar>
                                             <p>{auth.user?.username}</p>
                                         </div>
@@ -106,14 +108,11 @@ export default function Header() {
                                             <Accordion
                                                 type="single"
                                                 collapsible
-
                                             >
-                                                <AccordionItem value="item-1" >
+                                                <AccordionItem value="item-1">
                                                     <AccordionTrigger>
                                                         <div className=" flex items-center justify-center sm:justify-start gap-2 font-bold">
-                                                            <Eclipse
-
-                                                            />
+                                                            <Eclipse />
                                                             <span className=" font-bold">
                                                                 Mode
                                                             </span>
@@ -165,7 +164,12 @@ export default function Header() {
                                         </li>
 
                                         <li className="w-full">
-                                            <Link href={route('account.dashboard')} className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded ">
+                                            <Link
+                                                href={route(
+                                                    "account.dashboard"
+                                                )}
+                                                className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded "
+                                            >
                                                 <UserCog />
                                                 <p className="text-lg sm:text-sm">
                                                     Account information
@@ -176,12 +180,47 @@ export default function Header() {
                                         </li>
 
                                         <li className="w-full">
-                                            <Link href={route('acccount.liked.posts.show')} className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded">
+                                            <Link
+                                                href={route(
+                                                    "acccount.liked.posts.show"
+                                                )}
+                                                className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded"
+                                            >
                                                 <ThumbsUp />
                                                 <p className="text-lg sm:text-sm">
                                                     Liked Posts
                                                 </p>
                                             </Link>
+                                        </li>
+
+                                          <li className="w-full">
+                                            <Link
+                                                href={route(
+                                                    "account.bluemark.verified.dashboard"
+                                                , {id: auth.user.id})}
+                                                className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded"
+                                            >
+                                                <Verified />
+                                                <p className="text-lg sm:text-sm">
+                                                    Bluemark Verification
+                                                </p>
+                                            </Link>
+                                        </li>
+
+                                        <li className="w-full">
+                                            {auth.user.role === ("superadmin" || "admin")  && (
+                                                    <Link
+                                                        href={route(
+                                                            "admin.dashboard"
+                                                        )}
+                                                        className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded"
+                                                    >
+                                                        <ShieldUser />
+                                                        <p className="text-lg sm:text-sm">
+                                                            Admin Dashboard
+                                                        </p>
+                                                    </Link>
+                                                )}
                                         </li>
                                     </ul>
                                 </div>

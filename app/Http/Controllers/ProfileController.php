@@ -34,7 +34,7 @@ class ProfileController extends Controller
             'followers',
             'followings'
         ]);
-        return Inertia::render('UserAccount/Account', [
+        return Inertia::render('User/UserAccount/Account', [
             'posts' => $posts,
             'auth' => [
                 'user' => $user
@@ -67,7 +67,7 @@ class ProfileController extends Controller
             'bluemark'
         ]);
 
-        return Inertia::render('UserAccount/ProfileShow', [
+        return Inertia::render('User/UserAccount/ProfileShow', [
             'posts' => $posts,
             'followingUser' => $followingUser,
             'auth' => [
@@ -78,7 +78,7 @@ class ProfileController extends Controller
 
     public function edit(Request $request): Response
     {
-        return Inertia::render('UserAccount/ProfileEdit', [
+        return Inertia::render('User/UserAccount/ProfileEdit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
         ]);
@@ -111,7 +111,7 @@ class ProfileController extends Controller
             ->withCount(['likes', 'views', 'comments'])
             ->latest() // Sort by when I liked them!
             ->get();
-        return Inertia::render('UserAccount/LikedPost', ['posts' => $posts]);
+        return Inertia::render('User/UserAccount/LikedPost', ['posts' => $posts]);
     }
 
 

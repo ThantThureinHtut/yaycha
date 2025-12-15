@@ -1,6 +1,6 @@
 import Blog from "@/Components/Blogs/Blog";
 import Header from "@/Components/Header";
-import usePostEcho from "@/Components/Hooks/usePostEcho";
+import usePostEcho from "@/Components/Hooks/usePostEcho.jsx";
 import PostCreateBox from "@/Components/Posts/PostCreateBar";
 import { Avatar, AvatarImage } from "@/Components/ui/avatar";
 import { Button } from "@/Components/ui/button";
@@ -93,8 +93,8 @@ export default function AccountInformation({ posts: initialPosts }) {
                             </div>
                         </CardHeader>
                         <Separator className="mb-8" />
-                        <CardContent>
-                            <CardTitle>Your Posts</CardTitle>
+                        <CardContent className="p-0 md:p-6">
+                            <CardTitle className="pl-4 md:pl-0">Your Posts</CardTitle>
                             <div className="rounded mt-4 mx-auto">
                                 <PostCreateBox />
                             </div>

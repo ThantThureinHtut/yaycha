@@ -29,7 +29,7 @@ class CommentController extends Controller
         ->with('replies')
         ->get();
 
-    return Inertia::render('Blog/CommentPage' , ['post' => $post  , 'comments' => $comments]);
+    return Inertia::render('User/Blog/CommentPage' , ['post' => $post  , 'comments' => $comments]);
     }
 
     public function store(Request $request){

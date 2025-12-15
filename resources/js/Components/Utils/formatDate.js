@@ -9,8 +9,8 @@ export default function formatDate(input_data) {
         .replace("less than a minute", "just now")
         .replace("just now ago", "just_now")
         .replace(" ", "")
-        .replace("minutes ago", "m")
-        .replace("minute ago", "m")
-        .replace("hour ago", "h")
-        .replace("hours ago", "h");
+        .replace("minutes ago", "m ago")
+        .replace("minute ago", "m ago")
+        .replace("hour ago", "h ago")
+        .replace("hours ago", "h ago");
 }

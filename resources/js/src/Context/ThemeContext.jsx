@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, use } from "react";
 const ThemeContext = createContext();
 export const useTheme = () => useContext(ThemeContext);
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/sonner";
+
 export default function ThemeProvider({ children }) {
     const queryClient = new QueryClient();
     const savedTheme = localStorage.getItem("theme");
@@ -11,10 +11,10 @@ export default function ThemeProvider({ children }) {
         "(prefers-color-scheme: dark)"
     ).matches;
     // Set The Default Value For Theme
-    const [theme, setTheme] = useState(() => savedTheme || "light");
+    const [theme, setTheme] = useState(() => savedTheme || "system");
     const [isAi , setAi] = useState(false);
     const [isOpen , setOpen] = useState(false);
-    const [sharePost , setSharePost] = useState();
+
     // Dark Mode
     const darkMode = (root) => {
         root.classList.add("dark");
@@ -51,9 +51,8 @@ export default function ThemeProvider({ children }) {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <ThemeContext.Provider value={{ theme, setTheme , isAi ,setAi , isOpen , setOpen , sharePost ,  setSharePost }}>
+            <ThemeContext.Provider value={{ theme, setTheme , isAi ,setAi , isOpen , setOpen  }}>
                 {children}
-                <Toaster position="top-center" swipeDirection="up" />
             </ThemeContext.Provider>
         </QueryClientProvider>
     );

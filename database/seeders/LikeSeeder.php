@@ -39,7 +39,7 @@ class LikeSeeder extends Seeder
                 'email' => fake()->email(),
                 'username' => fake()->name(),
                 'password' => 'password',
-                'provider_method' => 'mual',
+                'provider_method' => 'manual',
             ]);
         }
     }

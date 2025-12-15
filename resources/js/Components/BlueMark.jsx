@@ -12,8 +12,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BadgeCheckIcon } from "lucide-react";
+import { Link, usePage } from "@inertiajs/react";
 export default function BlueMark() {
-
+    const {auth} = usePage().props;
 
     return (
         <AlertDialog>
@@ -39,8 +40,11 @@ export default function BlueMark() {
                         This account has successfully completed our identity verification process. The Bluemarks badge confirms that this profile is authentic and trustworthy.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter className="inline-flex sm:justify-center w-full">
-                         <AlertDialogAction className="bg-blue-500 text-white dark:bg-blue-600 hover:bg-blue-700 w-full" >Continue</AlertDialogAction>
+                <AlertDialogFooter className=" flex gap-2 w-full">
+                          <AlertDialogCancel className="">Cancel</AlertDialogCancel>
+                         <AlertDialogAction className=" bg-blue-500 text-white dark:bg-blue-600 hover:bg-blue-700 w-full" >
+                            <Link href={route("account.bluemark.verified.dashboard" , {id:auth.user.id })}>verified now</Link>
+                         </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

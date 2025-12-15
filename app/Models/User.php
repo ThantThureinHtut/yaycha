@@ -12,10 +12,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Laravel\Scout\Searchable;
+
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable , Searchable;
+    use HasFactory, Notifiable, Searchable;
 
     /**
      * The attributes that are mass assignable.
@@ -41,7 +42,8 @@ class User extends Authenticatable
         'has_password',
         'followers_count_formatted',
         'followings_count_formatted',
-        'bluemark_boolean'
+        'bluemark_boolean',
+        'verified_status'
     ];
     /**
      * The attributes that should be hidden for serialization.
@@ -67,7 +69,7 @@ class User extends Authenticatable
     }
 
 
-    public function searchableAs():string
+    public function searchableAs(): string
     {
         return 'users_index';
     }
@@ -75,17 +77,20 @@ class User extends Authenticatable
     /**
      * Get the indexable data array for model
      */
-    public function toSearchableArray():array
+    public function toSearchableArray(): array
     {
-       return [
+
+        return [
             'id' => $this->id,
-            'name' => $this->name,
-            'email' => $this->email,
             'username' => $this->username,
-            'avatar_url' => $this->avatar_url,
-            'bluemark' => $this->bluemark,
-            'followers_count_formatted' => $this->followers_count_formatted
-       ];
+            'email' => $this->email,
+            'created_at' => $this->created_at->timestamp, // Using timestamp helps sorting
+            'bio' => $this->bio,
+            // THIS IS THE FIX:
+            // We force the value to be calculated and saved into Meilisearch
+            'verified_status' => $this->verified_status,
+            'provider_method' => $this->provider_method,
+        ];
     }
 
 
@@ -115,16 +120,35 @@ class User extends Authenticatable
             }
         );
     }
-    protected function bluemarkBoolean():Attribute{
+    protected function bluemarkBoolean(): Attribute
+    {
         return Attribute::make(
             get: function () {
-                 $this->load('bluemark');
-                 return isset($this->bluemark);
+                return isset($this->bluemark);
             }
         );
     }
-     public function bluemark(){
-        return $this->belongsTo(Bluemark::class , 'id');
+
+    protected function verifiedStatus(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                // 1. Check if the info exists
+                if ($this->verifiedacountinfo) {
+                    // 2. Return the actual text (e.g., 'pending')
+                    return $this->verifiedacountinfo->status;
+                }
+
+                // 3. Return a default if no info exists
+                return 'unverified';
+            }
+        );
+    }
+
+
+    public function bluemark()
+    {
+        return $this->belongsTo(Bluemark::class, 'id');
     }
     public function posts()
     {
@@ -182,6 +206,9 @@ class User extends Authenticatable
         return $this->belongsToMany(User::class, 'follows', 'follower_id', 'user_id');
     }
 
-
-
+    // Account Infor
+    public function verifiedacountinfo()
+    {
+        return $this->hasOne(VerifiedAccountInfo::class);
+    }
 }

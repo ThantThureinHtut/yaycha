@@ -43,6 +43,7 @@ class FollowPrivateNotification implements ShouldBroadcast
             'id' => $this->followerUser->id,
             'username' => $this->followerUser->username,
             'email' => $this->followerUser->email,
+            'avatar_url' => $this->followerUser->avatar_url,
             'userId' => $this->userId,
         ];
     }
