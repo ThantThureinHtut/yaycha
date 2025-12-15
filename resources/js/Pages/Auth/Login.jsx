@@ -1,6 +1,6 @@
 import AuthLayout from "@/Layouts/AuthLayout";
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import {
     Card,
     CardContent,
@@ -10,8 +10,8 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { AlertCircleIcon, CheckCircle2Icon, PopcornIcon } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Rabbit } from "lucide-react";

@@ -7,7 +7,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
+} from "@/Components/ui/table";
 import {
     Dialog,
     DialogClose,
@@ -17,14 +17,14 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/Components/ui/dialog";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select";
+} from "@/Components/ui/select";
 import formatDate from "@/Components/Utils/formatDate";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { MoreHorizontal, Search } from "lucide-react";

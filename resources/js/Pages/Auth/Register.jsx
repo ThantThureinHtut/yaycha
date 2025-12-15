@@ -1,6 +1,6 @@
 import AuthLayout from "@/Layouts/AuthLayout";
 import { Head, useForm } from "@inertiajs/react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import {
     Card,
     CardContent,
