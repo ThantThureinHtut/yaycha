@@ -8,7 +8,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/Components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/Components/ui/badge";
 import { Input } from "@/Components/ui/input";
 import { InputGroup, InputGroupInput } from "@/Components/ui/input-group";
 import { Separator } from "@/Components/ui/separator";
