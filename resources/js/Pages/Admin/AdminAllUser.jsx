@@ -10,7 +10,7 @@ import {
 } from "@/Components/ui/table";
 
 
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/Components/ui/badge";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { MoreHorizontalIcon, Search } from "lucide-react";
 
