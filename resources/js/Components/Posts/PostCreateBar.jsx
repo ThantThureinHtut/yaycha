@@ -5,7 +5,7 @@ import {
     InputGroupInput,
     InputGroupText,
     InputGroupTextarea,
-} from "@/components/ui/input-group";
+} from "@/Components/ui/input-group";
 
 import {
     Dialog,
@@ -16,7 +16,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/Components/ui/dialog";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -27,9 +27,9 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@/Components/ui/alert-dialog";
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
 import { Link, useForm, usePage } from "@inertiajs/react";
 import {
     ArrowUpIcon,
@@ -41,8 +41,8 @@ import {
     TriangleAlert,
     BadgeCheck,
 } from "lucide-react";
-import { Avatar } from "@/components/ui/avatar";
-import { AvatarImage } from "@/components/ui/avatar";
+import { Avatar } from "@/Components/ui/avatar";
+import { AvatarImage } from "@/Components/ui/avatar";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";

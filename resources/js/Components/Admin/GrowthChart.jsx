@@ -1,4 +1,4 @@
-"use client";
+
 
 import { TrendingUp } from "lucide-react";
 import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts";
@@ -10,12 +10,12 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card";
+} from "@/Components/ui/card";
 import {
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
-} from "@/components/ui/chart";
+} from "@/Components/ui/chart";
 
 // 1. UPDATE CONFIG: Change 'desktop' to 'users' and set your Yellow color
 const chartConfig = {

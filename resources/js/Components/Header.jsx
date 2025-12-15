@@ -7,14 +7,14 @@ import {
     DrawerDescription,
     DrawerFooter,
     DrawerClose,
-} from "@/components/ui/drawer";
+} from "@/Components/ui/drawer";
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
+} from "@/Components/ui/accordion";
+import { Button } from "@/Components/ui/button";
 import { Link, usePage } from "@inertiajs/react";
 import {
     Rabbit,
@@ -30,16 +30,16 @@ import {
     ShieldUser,
     Verified,
 } from "lucide-react";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/Components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/Components/ui/radio-group";
 import { Head } from "@inertiajs/react";
-import { Card, CardHeader } from "@/components/ui/card";
+import { Card, CardHeader } from "@/Components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Switch } from "@/Components/ui/switch";
-import { Separator } from "@/components/ui/separator";
+import { Separator } from "@/Components/ui/separator";
 import { useEffect, useState } from "react";
 import { useTheme } from "@/src/Context/ThemeContext";
-import SearchBox from "@/components/SearchBox";
+import SearchBox from "@/Components/SearchBox";
 export default function Header() {
     const { auth } = usePage().props;
     const { theme, setTheme } = useTheme();

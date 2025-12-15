@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import { Github } from "lucide-react";
 import GoogleIcon from "@/Components/GoogleIcon";
 export default function OAuthButtons() {

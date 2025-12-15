@@ -20,7 +20,7 @@ import {
     Italic,
 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/Components/ui/badge";
 import BlueMark from "../BlueMark";
 import { Separator } from "../ui/separator";
 import { Link, useForm, usePage } from "@inertiajs/react";

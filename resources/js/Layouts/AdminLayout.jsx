@@ -1,6 +1,6 @@
 // 1. Fix the Import: Change "AppSlider" to "AppSidebar"
 import { AppSidebar } from "@/Components/Admin/AppSider";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/Components/ui/sidebar";
 
 export default function AdminLayout({ children ,verifiedUserCounts }) {
   return (

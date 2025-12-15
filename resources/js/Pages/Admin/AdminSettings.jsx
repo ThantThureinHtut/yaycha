@@ -7,14 +7,14 @@ import {
     ItemDescription,
     ItemMedia,
     ItemTitle,
-} from "@/components/ui/item";
+} from "@/Components/ui/item";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select";
+} from "@/Components/ui/select";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { useTheme } from "@/src/Context/ThemeContext";
 import { Moon, Settings, Sun } from "lucide-react";

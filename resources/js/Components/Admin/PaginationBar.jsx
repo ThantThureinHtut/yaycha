@@ -6,7 +6,7 @@ import {
     PaginationLink,
     PaginationNext,
     PaginationPrevious,
-} from "@/components/ui/pagination";
+} from "@/Components/ui/pagination";
 import { router } from "@inertiajs/react";
 
 export default function PaginationBar({ links, search, filter }) {

@@ -5,7 +5,7 @@ import {
     InputGroupInput,
     InputGroupText,
     InputGroupTextarea,
-} from "@/components/ui/input-group";
+} from "@/Components/ui/input-group";
 import {
     Item,
     ItemActions,
@@ -15,7 +15,7 @@ import {
     ItemHeader,
     ItemMedia,
     ItemTitle,
-} from "@/components/ui/item";
+} from "@/Components/ui/item";
 
 import { Link, router, useForm, usePage } from "@inertiajs/react";
 import { ArrowUpIcon, Search } from "lucide-react";

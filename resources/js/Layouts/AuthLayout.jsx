@@ -1,7 +1,7 @@
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
 import { Link, useForm , usePage } from "@inertiajs/react";
 
 export default function AuthLayout({ children }) {
