@@ -5,8 +5,8 @@ import {
     InputGroupInput,
     InputGroupText,
     InputGroupTextarea,
-} from "@/components/ui/input-group";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+} from "@/Components/ui/input-group";
+import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -17,9 +17,9 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@/Components/ui/alert-dialog";
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
 import { Link, useForm, usePage } from "@inertiajs/react";
 import {
     ArrowUpIcon,
@@ -33,8 +33,8 @@ import {
     AlertCircleIcon,
     ArrowLeft,
 } from "lucide-react";
-import { Avatar } from "@/components/ui/avatar";
-import { AvatarImage } from "@/components/ui/avatar";
+import { Avatar } from "@/Components/ui/avatar";
+import { AvatarImage } from "@/Components/ui/avatar";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
