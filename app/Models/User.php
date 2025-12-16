@@ -11,12 +11,11 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
-use Laravel\Scout\Searchable;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, Searchable;
+    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -74,24 +73,6 @@ class User extends Authenticatable
         return 'users_index';
     }
 
-    /**
-     * Get the indexable data array for model
-     */
-    public function toSearchableArray(): array
-    {
-
-        return [
-            'id' => $this->id,
-            'username' => $this->username,
-            'email' => $this->email,
-            'created_at' => $this->created_at->timestamp, // Using timestamp helps sorting
-            'bio' => $this->bio,
-            // THIS IS THE FIX:
-            // We force the value to be calculated and saved into Meilisearch
-            'verified_status' => $this->verified_status,
-            'provider_method' => $this->provider_method,
-        ];
-    }
 
 
 

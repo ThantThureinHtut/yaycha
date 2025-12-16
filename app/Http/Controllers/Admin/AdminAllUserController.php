@@ -15,7 +15,8 @@ class AdminAllUserController extends Controller
         $query = request()->query('search');
         // $search = $request->input('search');
         $filter = request()->query('filter');
-        $userSearchData = User::search($query);
+        $userSearchData = User::query()->where('name', 'LIKE', "%{$query}%")
+            ->orWhere('email', 'LIKE', "%{$query}}");
         switch ($filter) {
             case "sortAToZ":
                 $userSearchData->orderBy('username', 'asc');
@@ -44,8 +45,7 @@ class AdminAllUserController extends Controller
         logger();
         return Inertia::render("Admin/AdminAllUser", [
             'userData' => $userData,
-            'filters' => [ 'search' => $query , 'filter' => $filter]
+            'filters' => ['search' => $query, 'filter' => $filter]
         ]);
     }
-
 }

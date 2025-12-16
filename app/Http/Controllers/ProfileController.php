@@ -119,7 +119,10 @@ class ProfileController extends Controller
      */
     public function search(Request $request):JsonResponse{
         $query = $request->input('query');
-        $users = User::search($query)->get();
+        $users = User::query()
+                ->where('name' , 'LIKE' , "%{$query}%")
+                ->orWhere('email' , 'LIKE' , "%{$query}}")
+                ->get();
         return response()->json([
             'users' => $users
         ]);
