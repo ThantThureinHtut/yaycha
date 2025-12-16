@@ -16,10 +16,13 @@ class AdminVerificationsController extends Controller
         $query = request()->query('search');
         $filter = request()->query('filter');
         $userSearchData = User::query()
-                    ->whereIn('verified_status', ["pending", "success"])
-                    ->where('name', 'LIKE', "%{$query}%")
-                    ->orWhere('email', 'LIKE', "%{$query}%")
-                   ;
+            ->whereHas('verifiedacountinfo', function ($q) {
+                $q->whereIn('status', ["pending", "success"]);
+            })
+            ->where(function ($q) use ($query) {
+                $q->where('name', 'LIKE', "%{$query}%")
+                    ->orWhere('email', 'LIKE', "%{$query}%");
+            });;
         switch ($filter) {
             case "sortAToZ":
                 $userSearchData->orderBy('username', 'asc');
