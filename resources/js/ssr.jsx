@@ -1,4 +1,4 @@
-import { createServer } from '@inertiajs/react/server'
+import createServer from '@inertiajs/react/server'
 import ReactDOMServer from 'react-dom/server'
 import { createInertiaApp } from '@inertiajs/react'
 import ThemeProvider from './src/Context/ThemeContext'

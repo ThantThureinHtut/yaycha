@@ -29,7 +29,7 @@ import { toast } from "sonner";
 import NProgress from "nprogress";
 import "next-themes";
 import axios$1 from "axios";
-import { createServer } from "@inertiajs/react/server";
+import createServer from "@inertiajs/react/server";
 import ReactDOMServer from "react-dom/server";
 function cn(...inputs) {
   return twMerge(clsx(inputs));
