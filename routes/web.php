@@ -86,7 +86,7 @@ Route::group(['prefix' => '/post', 'middleware' => 'auth'], function () {
 
 Route::group(['prefix' => '/account/', 'middleware' => 'auth'], function () {
     Route::get('/', [ProfileController::class, 'account'])->name('account.dashboard');
-    Route::get('/profile.php', [ProfileController::class, 'show'])->name('account.show');
+    Route::get('/profile/{id}', [ProfileController::class, 'show'])->name('account.show');
 
     // Follow
     Route::get('/follow/', [FollowController::class, 'index'])->name('account.follow');

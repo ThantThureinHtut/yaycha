@@ -44,10 +44,9 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
-    public function show():Response
+    public function show($id)
     {
 
-        $id = request()->query('id');
         $posts = Post::with(['user:id,username,email,avatar_url,bio', 'likes', 'views', 'comments.user:id,username,avatar_url,bio']) // Load user and likes data efficiently
             ->where('user_id' , $id)
             ->withCount(['likes', 'views', 'comments']) // Automatically counts likes as 'likes_count'
