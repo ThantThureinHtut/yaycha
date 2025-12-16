@@ -16,7 +16,7 @@ class AdminAllUserController extends Controller
         // $search = $request->input('search');
         $filter = request()->query('filter');
         $userSearchData = User::query()->where('name', 'LIKE', "%{$query}%")
-            ->orWhere('email', 'LIKE', "%{$query}}");
+            ->orWhere('email', 'LIKE', "%{$query}%");
         switch ($filter) {
             case "sortAToZ":
                 $userSearchData->orderBy('username', 'asc');
