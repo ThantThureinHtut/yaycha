@@ -40,7 +40,7 @@ Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback']
 
 // Home route and Load the posts
 Route::get('/home', function () {
-    $posts = Post::with(['user:id,username,email,avatar_url', 'likes', 'views']) // Load user and likes data efficiently
+    $posts = Post::with(['user:id,username,email,avatar_url', 'likes', 'views' ]) // Load user and likes data efficiently
         ->withCount(['likes', 'views', 'comments']) // Automatically counts likes as 'likes_count'
         ->latest()
         ->get();
@@ -73,10 +73,15 @@ Route::group(['prefix' => '/post', 'middleware' => 'auth'], function () {
 
     // Post Veiw , Like , Comment
     Route::get('/post_views', [ViewController::class, 'index'])->name('post.view');
-    Route::post('/post/views/store', [ViewController::class, 'store'])->name('post.viewStore');
-    Route::post('/post/like/store', [LikeController::class, 'store'])->name('post.likeStore');
-    Route::get('/post/{id}/comments', [CommentController::class, 'index'])->name('post.comments.dashboard');
-    Route::post('/post/comments', [CommentController::class, 'store'])->name('post.comments.store');
+    Route::post('/views/store', [ViewController::class, 'store'])->name('post.viewStore');
+    Route::post('/like/store', [LikeController::class, 'store'])->name('post.likeStore');
+    Route::get('/{id}/comments', [CommentController::class, 'index'])->name('post.comments.dashboard');
+    Route::post('/comments', [CommentController::class, 'store'])->name('post.comments.store');
+
+    // Post Edit and Delete Feature
+    Route::post('/delete' , [PostController::class , 'delete'])->name('post.delete');
+    Route::get("/edit/{id}" , [PostController::class , 'edit'])->name('post.edit.show');
+    Route::post('/update' , [PostController::class , 'update'])->name('post.update');
     // AI generate-title
     Route::post('/generate-title', [PostController::class, 'generateTitle'])
         ->name('post.generate-title')
@@ -84,12 +89,12 @@ Route::group(['prefix' => '/post', 'middleware' => 'auth'], function () {
 });
 
 
-Route::group(['prefix' => '/account/', 'middleware' => 'auth'], function () {
+Route::group(['prefix' => '/account', 'middleware' => 'auth'], function () {
     Route::get('/', [ProfileController::class, 'account'])->name('account.dashboard');
     Route::get('/profile/{id}', [ProfileController::class, 'show'])->name('account.show');
 
     // Follow
-    Route::get('/follow/', [FollowController::class, 'index'])->name('account.follow');
+    Route::post('/follow/', [FollowController::class, 'index'])->name('account.follow');
     Route::post('/follow/{id}', [FollowController::class, 'store'])->name('account.follow.store');
 
     // Liked Posts

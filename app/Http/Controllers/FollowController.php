@@ -13,10 +13,10 @@ use Inertia\Inertia;
 
 class FollowController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $follow = User::with('followers', 'followings');
-        return response()->json(['follow' => $follow]);
+        $folloingUser = User::with('followers', 'followings')->where('id' , $request->id)->first();
+        return response()->json(['folloingUser' => $folloingUser]);
     }
     public function store($id)
     {

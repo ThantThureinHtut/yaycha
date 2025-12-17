@@ -54,28 +54,14 @@ import "nprogress/nprogress.css"; // Import the CSS
 import axios from "axios";
 import PostCreate from "./PostCreate";
 import { useTheme } from "@/src/Context/ThemeContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 export default function PostCreateBar({setPosts}) {
-    const [isMobile, setMobile] = useState(false);
+    const isMobile = useIsMobile();
     const { auth } = usePage().props;
 
     // This Come from Post Create , i want to send the data from child route to parent route
     const { isAi, isOpen, setOpen } = useTheme();
 
-    // When user is mounted , check the screen window size.
-    // if it is mobile size like < 768 , it return true, > 768 -> false
-    // can always trigger the window resize with addEventListener('resize')
-    useEffect(() => {
-        const checkSize = () => {
-            setMobile(window.innerWidth < 768);
-        };
-        checkSize();
-
-        window.addEventListener("resize", checkSize);
-
-        // need to run  when components is unmounted , it will clear your effect.
-        // to optain the preformace
-        return () => window.removeEventListener("resize", checkSize);
-    }, []);
 
     return (
         <div className="flex items-center gap-2 lg:w-1/2 container mx-auto my-4 px-4 sm:px-0">
@@ -88,7 +74,7 @@ export default function PostCreateBar({setPosts}) {
                 href={isMobile ? route("post.dashboard") : "/"}
                 className={isMobile ? "block w-full" : "hidden"}
             >
-                <InputGroup>
+                <InputGroup className={`${isMobile && " pointer-events-none"}`}>
                     <InputGroupInput placeholder="What's on your mind?..." />
                 </InputGroup>
             </Link>

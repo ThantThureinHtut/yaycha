@@ -18,7 +18,7 @@ class VerifiedAccountInfo extends Model
         'created_at',
         'updated_at'
     ];
-    protected $touches = ['user'];
+    // protected $touches = ['user'];
     public function user(){
         return $this->belongsTo(User::class);
     }

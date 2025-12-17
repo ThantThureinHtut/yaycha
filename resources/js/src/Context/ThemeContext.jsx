@@ -14,6 +14,7 @@ export default function ThemeProvider({ children }) {
     const [theme, setTheme] = useState(() => savedTheme || "system");
     const [isAi , setAi] = useState(false);
     const [isOpen , setOpen] = useState(false);
+    const [isUpdateOpen , setUpdateOpen] = useState(false);
 
     // Dark Mode
     const darkMode = (root) => {
@@ -51,7 +52,7 @@ export default function ThemeProvider({ children }) {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <ThemeContext.Provider value={{ theme, setTheme , isAi ,setAi , isOpen , setOpen  }}>
+            <ThemeContext.Provider value={{ theme, setTheme , isAi ,setAi , isOpen , setOpen  , isUpdateOpen , setUpdateOpen }}>
                 {children}
             </ThemeContext.Provider>
         </QueryClientProvider>

@@ -10,7 +10,4 @@ class BluemarkController extends Controller
     public function index(){
         return Inertia::render('User/UserAccount/BluemarkVerified');
     }
-    public function store(Request $request){
-
-    }
 }

@@ -8,7 +8,7 @@ export default function ExpandableText({ blog , viewSumbitHandler }) {
     return (
         <div>
             {isShortText ? (
-                <div  className="text-sm sm:text-md text-gray-700 dark:text-gray-300 text-justify"  onClick={() => viewSumbitHandler()}>{blog.description}</div>
+                <div  className="text-sm sm:text-md text-gray-700 dark:text-gray-300 text-justify whitespace-normal break-all"  onClick={() => viewSumbitHandler()}>{blog.description}</div>
             ) : (
                 <div
                     className="text-sm sm:text-md text-gray-700 dark:text-gray-300 text-justify"

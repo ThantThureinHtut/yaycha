@@ -129,7 +129,7 @@ class User extends Authenticatable
 
     public function bluemark()
     {
-        return $this->belongsTo(Bluemark::class, 'id');
+        return $this->hasOne(Bluemark::class, 'user_id');
     }
     public function posts()
     {

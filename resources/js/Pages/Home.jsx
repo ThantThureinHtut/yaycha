@@ -23,7 +23,7 @@ export default function Home({ posts: initialPosts }) {
         <GuestLayout>
             <div>
                 {/* Pass the setPosts to the PostCreate Page to make the Optimistic UI Update post */}
-                <PostCreateBar setPosts={setPosts} />
+                <PostCreateBar setPosts={setPosts} action="Post" />
                 <div>
                     {posts.map((post) => (
                     <Blog key={post.id} post={post}  />

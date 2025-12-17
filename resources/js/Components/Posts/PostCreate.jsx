@@ -40,18 +40,24 @@ import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Badge } from "../ui/badge";
 import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
-// Import the CSS
-import axios from "axios";
+import toast from "react-hot-toast";
 import { useTheme } from "@/src/Context/ThemeContext";
 import useAiGengerateTitle from "../Hooks/useAiGengerateTitle"; // this function does the Ai Title Generate Process
-export default function PostCreate({ setPosts = null  }) {
+import { useIsMobile } from "@/hooks/use-mobile";
+export default function PostCreate({
+    setPosts = null,
+    action,
+    postData = null,
+}) {
     const { auth } = usePage().props;
-    const { setAi, setOpen } = useTheme();
-
-    const [isMobile, setMobile] = useState(false);
+    const { setAi, setOpen , setUpdateOpen } = useTheme();
+    const isMobile = useIsMobile();
+    // If login user have bluemark or not
     const blueMarkCheck = auth.user?.bluemark_boolean === true;
     const [isAiErrorMessage, setAiErrorMessage] = useState("");
+
+    // This Check Where We call this componenet , if use the componenet from updatepost components , change the all function to update and edit
+    const actionStatus = postData && action == "Update" ? true : false;
     const {
         data,
         setData,
@@ -62,22 +68,11 @@ export default function PostCreate({ setPosts = null  }) {
         isPending,
         progress,
         reset,
-    } = useForm({ title: "", body: "" });
-
-    //This is use for resize and depend on the page size
-    useEffect(() => {
-        const checkSize = () => {
-            setMobile(window.innerWidth < 768);
-        };
-        checkSize();
-
-        window.addEventListener("resize", checkSize);
-
-        // need to run  when components is unmounted , it will clear your effect.
-        // to optain the preformace
-        return () => window.removeEventListener("resize", checkSize);
-    }, []);
-
+    } = useForm({
+        post_id : actionStatus ? postData.id : "",
+        title: actionStatus ? postData.title : "",
+        body: actionStatus ? postData.description : "",
+    });
     // This is come From Hooks Folder
     const aiMutation = useAiGengerateTitle(
         setAi,
@@ -89,39 +84,36 @@ export default function PostCreate({ setPosts = null  }) {
     // Create the Post Submit
     const createPostHandler = (e) => {
         e.preventDefault();
-        if(!isMobile){
-             const fakeData = {
-                    id: Date.now(), // this fake id for a while until real data is reach from databse
-                    title: data.title,
-                    description: data.body,
-                    user_id: auth.user.id,
-                    created_at: new Date().toISOString(), // this fake id for a while until real data is reach from databse
-                    user: {
-                        id: auth.user.id,
-                        username: auth.user.username,
-                        email: auth.user.email,
-                        bluemark: auth.user.bluemark,
-                        avatar_url: auth.user.avatar_url,
-                    },
-                    likes: [],
-                    comments: [],
-                    views: [],
-                    likes_count_formatted: "0", // Blog.jsx needs this!
-                    views_count_formatted: "0", // Blog.jsx needs this!
-                    comments_count_formatted: "0",
-                }
+         if (!isMobile) {
+                    // ONLY close the modal if the post was successfulÍ
 
-         setPosts((prevPost) =>  [
-                fakeData,
-                ...prevPost,
-            ]
-        );
+                    const fakeData = {
+                        id: Date.now(), // this fake id for a while until real data is reach from databse
+                        title: data.title,
+                        description: data.body,
+                        user_id: auth.user.id,
+                        created_at: new Date().toISOString(), // this fake id for a while until real data is reach from databse
+                        user: {
+                            id: auth.user.id,
+                            username: auth.user.username,
+                            email: auth.user.email,
+                            bluemark: auth.user.bluemark,
+                            avatar_url: auth.user.avatar_url,
+                        },
+                        likes: [],
+                        comments: [],
+                        views: [],
+                        likes_count_formatted: "0", // Blog.jsx needs this!
+                        views_count_formatted: "0", // Blog.jsx needs this!
+                        comments_count_formatted: "0",
+                    };
+
+                    setPosts((prevPost) => [fakeData, ...prevPost]);
         }
         post(route("post.create"), {
             onSuccess: () => {
                 reset();
-                // ONLY close the modal if the post was successful
-                if (!isMobile) {
+                if(!isMobile){
                     setOpen(false);
                 }
                 // Optional: Show a success toast here if you want
@@ -130,9 +122,39 @@ export default function PostCreate({ setPosts = null  }) {
         });
     };
 
+    // Update the Post
+    const updatePostHandler = (e) => {
+        e.preventDefault();
+        // Do the optimistic ui updates
+        setPosts((prevPost) => {
+            return {
+                ...prevPost,
+                title: data.title,
+                description: data.body,
+            };
+        });
+
+        // This submit
+        post(
+            route("post.update"),
+             {
+                onSuccess: () => {
+                    reset();
+                    // ONLY close the modal if the post was successful
+                    if (!isMobile) {
+                        // This make to close my dialog cuz don't use the original dialogclose tag so , we need to do our own.
+                        setUpdateOpen(false);
+                    }
+                    // Optional: Show a success toast here if you want
+                    toast("Update created successfully!");
+                },
+            }
+        );
+
+    };
     return (
         <form
-            onSubmit={createPostHandler}
+            onSubmit={actionStatus ? updatePostHandler : createPostHandler}
             className={`sm:max-w-xl w-full flex items-center justify-center gap-2 ${
                 aiMutation.isPending ? "[&>button]:hidden cursor-wait" : ""
             }`}
@@ -262,9 +284,16 @@ export default function PostCreate({ setPosts = null  }) {
                                         <AlertDialogCancel>
                                             Cancel
                                         </AlertDialogCancel>
-                                        <AlertDialogAction className="bg-blue-500 text-white hover:bg-blue-600">
-                                            <Link href={route("account.bluemark.verified.dashboard" , {id: auth.user.id})}>verified now</Link>
-                                        </AlertDialogAction>
+                                        <Link
+                                            href={route(
+                                                "account.bluemark.verified.dashboard",
+                                                { id: auth.user.id }
+                                            )}
+                                        >
+                                            <AlertDialogAction className="bg-blue-500 text-white hover:bg-blue-600">
+                                                verified now
+                                            </AlertDialogAction>
+                                        </Link>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>
@@ -275,6 +304,7 @@ export default function PostCreate({ setPosts = null  }) {
                 {/* Text Area */}
                 <InputGroup className=" !border-none !shadow-none !ring-0 has-[textarea]:!ring-0 dark:!border-none dark:!ring-0 dark:!bg-transparent ">
                     <InputGroupTextarea
+                        value={data.body}
                         onChange={(e) => setData("body", e.target.value)}
                         name="textarea"
                         disabled={aiMutation.isPending}
@@ -282,14 +312,28 @@ export default function PostCreate({ setPosts = null  }) {
                     />
                 </InputGroup>
 
-                {/* Post Button  */}
-                <Button
-                    type="submit"
-                    className={isMobile ? "hidden" : ""}
-                    disabled={data.body && data.title ? false : true}
-                >
-                    Post
-                </Button>
+                {/* For Update or Edit post Button  */}
+                {actionStatus && (
+                    <Button
+                        type="submit"
+                        className={isMobile ? "hidden" : ""}
+                        disabled={data.body && data.title ? false : true}
+
+                    >
+                        Update
+                    </Button>
+                )}
+
+                {/* For Create the post */}
+                {!actionStatus && (
+                    <Button
+                        type="submit"
+                        className={isMobile ? "hidden" : ""}
+                        disabled={data.body && data.title ? false : true}
+                    >
+                        Post
+                    </Button>
+                )}
             </div>
         </form>
     );

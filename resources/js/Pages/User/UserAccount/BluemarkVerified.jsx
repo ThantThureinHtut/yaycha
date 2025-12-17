@@ -13,7 +13,7 @@ import {
     InputGroupInput,
 } from "@/Components/ui/input-group";
 import { Link, useForm, usePage } from "@inertiajs/react";
-import { Hourglass, UserCheck, Verified } from "lucide-react";
+import { ArrowLeft, Hourglass, UserCheck, Verified } from "lucide-react";
 import { useState } from "react";
 
 export default function BluemarkVerified() {
@@ -70,16 +70,18 @@ export default function BluemarkVerified() {
         }
     };
     return (
-        <div>
+        <div className="m-4 sm:m-0">
             {auth.user.verified_status === "unverified" && (
                 <form
                     onSubmit={verifiedSubmitHandler}
-                    className="container mx-auto w-full md:w-1/2 flex justify-center items-center min-h-screen "
+                    className="container mx-auto w-full md:w-1/2 flex justify-center items-center min-h-screen"
                     encType="multipart/form-data"
                 >
+
                     <Card>
-                        <CardHeader className=" text-blue-500 text-xl font-bold">
-                            <div className="flex items-center ju gap-1">
+                        <CardHeader className="">
+                             <Link href="/home" className="p-1">Go back</Link>
+                            <div className="flex items-center ju gap-1  text-blue-500 text-xl font-bold">
                                 <Verified />
                                 <span>Verified Account</span>
                             </div>

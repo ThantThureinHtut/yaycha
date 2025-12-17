@@ -18,25 +18,36 @@ import {
     BookmarkIcon,
     HeartIcon,
     Italic,
+    MoreHorizontal,
 } from "lucide-react";
 
 import { Badge } from "@/Components/ui/badge";
 import BlueMark from "../BlueMark";
 import { Separator } from "../ui/separator";
-import { Link, useForm, usePage } from "@inertiajs/react";
+import { Link, router, useForm, usePage } from "@inertiajs/react";
 import { useState } from "react";
 import ExpandableText from "./ExpandableText";
-import axios from "axios";
-
 import { Button } from "../ui/button";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { set } from "nprogress";
 import formatNumber from "../Utils/formatNumber";
 import usePostInteractions from "../Hooks/usePostInteractions";
-export default function Blog({ post }) {
+import PostUpdate from "../Posts/PostUpdate";
+
+export default function Blog({ post: initalPost }) {
+    const [post, setPost] = useState(initalPost);
     const { auth } = usePage().props;
-    const [isPressed, setPressed] = useState(post.likes.some((like) => like.post_id === post.id && like.like_id === auth.user.id));
-    const { viewIn, likeIn } = usePostInteractions(post, auth, isPressed, setPressed);
+    const [isPressed, setPressed] = useState(
+        post.likes.some(
+            (like) => like.post_id === post.id && like.like_id === auth.user.id
+        )
+    );
+    const { viewIn, likeIn } = usePostInteractions(
+        post,
+        auth,
+        isPressed,
+        setPressed
+    );
     const viewSumbitHandler = () => {
         // check , if the user is exist , don't increase the view count
         // if not increae the count
@@ -49,19 +60,18 @@ export default function Blog({ post }) {
     };
     const likeSubmitHandler = () => {
         likeIn.mutate();
-        viewSumbitHandler()
-    }
+        viewSumbitHandler();
+    };
+
     return (
-        <div className="container flex flex-col gap-8 mx-auto my-3  md:w-full lg:w-1/2">
-            <Card  className="rounded-none md:rounded-xl">
+        <div className="container flex flex-col gap-8 mx-auto my-3 md:w-full lg:w-1/2 ">
+            <Card className="rounded-none md:rounded-xl">
                 <CardHeader>
-                    <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
+                    <div className="flex  items-center justify-between">
+                        <div className="flex items-center  gap-3">
                             <div>
                                 {post.user.id === auth.user.id ? (
-                                    <Link
-                                        href={route("account.dashboard")}
-                                    >
+                                    <Link href={route("account.dashboard")}>
                                         <Avatar>
                                             <AvatarImage
                                                 src={post.user?.avatar_url}
@@ -82,26 +92,36 @@ export default function Blog({ post }) {
                                     </Link>
                                 )}
                             </div>
-                            <div>
-                                <CardTitle>{post.title}</CardTitle>
+                            <div className="flex flex-col gap-2 ">
+                                <CardTitle className="whitespace-normal break-all w-full">
+                                    {post.title}
+                                </CardTitle>
                                 <CardDescription className="flex justify-between">
                                     <span className="flex items-center gap-2 text-xs sm:text-base">
-                                        <div> written by{" "}</div>
+                                        <div> written by </div>
                                         <b className="flex items-center gap-2">
                                             <span className="text-blue-500">
                                                 @{post.user.username}
                                             </span>
                                         </b>
-                                        {post.user.bluemark_boolean === true && <BlueMark />}
+                                        {post.user.bluemark_boolean ===
+                                            true && <BlueMark />}
                                     </span>
                                 </CardDescription>
                             </div>
                         </div>
-
-                        <span className="flex items-center gap-2">
-                            {post.views_count_formatted}
-                            <Eye size={20} />
-                        </span>
+                          <div className="flex  items-center gap-1">
+                                <span className="flex items-center gap-2 p-2">
+                                    {post.views_count_formatted}
+                                    <Eye size={20} />
+                                </span>
+                                <PostUpdate
+                                    post={post}
+                                    likeSubmitHandler={likeSubmitHandler}
+                                    isPressed={isPressed}
+                                    setPost={setPost}
+                                />
+                            </div>
                     </div>
                 </CardHeader>
                 <Separator className="mb-4" />
@@ -128,7 +148,12 @@ export default function Blog({ post }) {
                                     </div>
                                 </li>
                                 <li>
-                                    <Link href={route('post.comments.dashboard' , {id: post.id})} className="flex items-center gap-1" >
+                                    <Link
+                                        href={route("post.comments.dashboard", {
+                                            id: post.id,
+                                        })}
+                                        className="flex items-center gap-1"
+                                    >
                                         {post.comments_count_formatted}
                                         <MessageSquare size={20} />
                                     </Link>
@@ -138,6 +163,7 @@ export default function Blog({ post }) {
                     </Card>
                 </CardFooter>
             </Card>
+
         </div>
     );
 }

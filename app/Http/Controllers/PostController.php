@@ -19,7 +19,7 @@ class PostController extends Controller
     public function post(Request $request)
     {
         $validated = $request->validate([
-            'title' => ['required'],
+            'title' => ['required' , 'max:120'],
             'body' => ['required']
         ]);
 
@@ -91,5 +91,31 @@ class PostController extends Controller
         return response()->json([
             'title' => $title
         ]);
+    }
+
+    public function delete(Request $request)
+    {
+        $request->user()->posts()->where("id", $request->post_id)->delete();
+        return redirect()->back();
+    }
+
+    public function edit($id){
+        return Inertia::render("User/Blog/PostEditPage");
+    }
+    public function update(Request $request)
+    {
+        $request->validate([
+             'title' => ['required' , 'max:120'],
+             'body' => ['required']
+        ]);
+        $post = $request->user()->posts()->where("id", $request->post_id);
+        if (isset($request->title) && isset($request->body)) {
+            $post->update([
+                'title' => $request->title,
+                'description' => $request->body,
+            ]);
+        }
+        isset($request->title) ? $post->update(['title' => $request->title]) : $post->update(['description' => $request->body]);
+        return  redirect()->back();
     }
 }

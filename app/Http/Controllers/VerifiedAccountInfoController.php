@@ -36,6 +36,7 @@ class VerifiedAccountInfoController extends Controller
     public function update(Request $request)
     {
         $info = VerifiedAccountInfo::where('user_id', $request->user_id)->firstOrFail();
+        $bluemark = Bluemark::where('user_id' , $request->user_id)->first();
         if($request->status == 'rejected'){
             if(isset($info->government_image) && Storage::disk("public")->exists($info->government_image)){
                 Storage::disk("public")->delete($info->government_image);
@@ -43,8 +44,26 @@ class VerifiedAccountInfoController extends Controller
             if(isset($info->selfie_image) && Storage::disk("public")->exists($info->selfie_image)) {
                 Storage::disk("public")->delete($info->selfie_image);
             }
+            if(isset($bluemark)){
+                Bluemark::where('user_id' , $request->user_id)->delete();
+            }
 
             $info->delete();
+        }
+
+        if($request->status == "pending"){
+            if(isset($bluemark)){
+                 Bluemark::where('user_id' , $request->user_id)->delete();
+            }
+        }
+
+        if($request->status == "success"){
+            if(!isset($bluemark)){
+                Bluemark::create([
+                    'bluemark' => true,
+                    'user_id' => $request->user_id
+                ]);
+            }
         }
 
         $info->update([
