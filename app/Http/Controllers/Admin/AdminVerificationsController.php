@@ -41,6 +41,23 @@ class AdminVerificationsController extends Controller
         }
 
         $userData = $userSearchData->paginate(10);
+        // 2. USE 'through' to transform the data and add image URLs
+        $userData->through(function ($user) {
+            // Check if verifiedacountinfo exists to avoid errors
+            if ($user->verifiedacountinfo) {
+
+                // Add Government Image URL
+                $user->verifiedacountinfo->government_image = $user->verifiedacountinfo->government_image
+                    ? asset('storage/' . $user->verifiedacountinfo->government_image)
+                    : 'https://placehold.co/600x400';
+
+                // Add Selfie Image URL
+                $user->verifiedacountinfo->selfie_image = $user->verifiedacountinfo->selfie_image
+                    ? asset('storage/' . $user->verifiedacountinfo->selfie_image)
+                    : 'https://placehold.co/600x400';
+            }
+            return $user;
+        });
         return Inertia::render("Admin/AdminVerifications", [
             'users' => $userData,
             'filters' => ['search' => $query, 'filter' => $filter]
