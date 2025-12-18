@@ -20,7 +20,7 @@ import {
 } from "@/Components/ui/alert-dialog";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
-import { Link, useForm, usePage } from "@inertiajs/react";
+import { Link, router, useForm, usePage } from "@inertiajs/react";
 import {
     ArrowUpIcon,
     Search,
@@ -50,7 +50,7 @@ export default function PostCreate({
     postData = null,
 }) {
     const { auth } = usePage().props;
-    const { setAi, setOpen , setUpdateOpen } = useTheme();
+    const { setAi, setOpen, setUpdateOpen } = useTheme();
     const isMobile = useIsMobile();
     // If login user have bluemark or not
     const blueMarkCheck = auth.user?.bluemark_boolean === true;
@@ -69,7 +69,7 @@ export default function PostCreate({
         progress,
         reset,
     } = useForm({
-        post_id : actionStatus ? postData.id : "",
+        post_id: actionStatus ? postData.id : "",
         title: actionStatus ? postData.title : "",
         body: actionStatus ? postData.description : "",
     });
@@ -84,36 +84,36 @@ export default function PostCreate({
     // Create the Post Submit
     const createPostHandler = (e) => {
         e.preventDefault();
-         if (!isMobile) {
-                    // ONLY close the modal if the post was successfulÍ
+        if (!isMobile) {
+            // ONLY close the modal if the post was successfulÍ
 
-                    const fakeData = {
-                        id: Date.now(), // this fake id for a while until real data is reach from databse
-                        title: data.title,
-                        description: data.body,
-                        user_id: auth.user.id,
-                        created_at: new Date().toISOString(), // this fake id for a while until real data is reach from databse
-                        user: {
-                            id: auth.user.id,
-                            username: auth.user.username,
-                            email: auth.user.email,
-                            bluemark: auth.user.bluemark,
-                            avatar_url: auth.user.avatar_url,
-                        },
-                        likes: [],
-                        comments: [],
-                        views: [],
-                        likes_count_formatted: "0", // Blog.jsx needs this!
-                        views_count_formatted: "0", // Blog.jsx needs this!
-                        comments_count_formatted: "0",
-                    };
+            const fakeData = {
+                id: Date.now(), // this fake id for a while until real data is reach from databse
+                title: data.title,
+                description: data.body,
+                user_id: auth.user.id,
+                created_at: new Date().toISOString(), // this fake id for a while until real data is reach from databse
+                user: {
+                    id: auth.user.id,
+                    username: auth.user.username,
+                    email: auth.user.email,
+                    bluemark: auth.user.bluemark,
+                    avatar_url: auth.user.avatar_url,
+                },
+                likes: [],
+                comments: [],
+                views: [],
+                likes_count_formatted: "0", // Blog.jsx needs this!
+                views_count_formatted: "0", // Blog.jsx needs this!
+                comments_count_formatted: "0",
+            };
 
-                    setPosts((prevPost) => [fakeData, ...prevPost]);
+            setPosts((prevPost) => [fakeData, ...prevPost]);
         }
         post(route("post.create"), {
             onSuccess: () => {
                 reset();
-                if(!isMobile){
+                if (!isMobile) {
                     setOpen(false);
                 }
                 // Optional: Show a success toast here if you want
@@ -126,31 +126,41 @@ export default function PostCreate({
     const updatePostHandler = (e) => {
         e.preventDefault();
         // Do the optimistic ui updates
-        setPosts((prevPost) => {
-            return {
-                ...prevPost,
-                title: data.title,
-                description: data.body,
-            };
-        });
+        if (!actionStatus) {
+            setPosts((prevPost) => {
+                return {
+                    ...prevPost,
+                    title: data.title,
+                    description: data.body,
+                };
+            });
+        }
 
         // This submit
-        post(
-            route("post.update"),
-             {
-                onSuccess: () => {
-                    reset();
-                    // ONLY close the modal if the post was successful
-                    if (!isMobile) {
-                        // This make to close my dialog cuz don't use the original dialogclose tag so , we need to do our own.
-                        setUpdateOpen(false);
-                    }
-                    // Optional: Show a success toast here if you want
-                    toast("Update created successfully!");
-                },
-            }
-        );
+        post(route("post.update"), {
+            onSuccess: () => {
+                reset();
+                // ONLY close the modal if the post was successful
+                if (!isMobile) {
+                    // This make to close my dialog cuz don't use the original dialogclose tag so , we need to do our own.
+                    setUpdateOpen(false);
+                } else {
+                    /**
+                     * 1. window.history.back() (The Time Machine)
+                            Who runs it? The Browser (JavaScript).
 
+                            What it does: It simulates clicking the Back Button in your browser.
+
+                            Why it saves your scroll: The browser automatically saves a "snapshot" of where you were (scroll position, data) before you left the page. When you run this command, it restores that snapshot exactly as you left it.
+
+                            Best for: "Cancel" buttons or "Return" buttons where you want to go back to exactly where you were.
+                     */
+                    window.history.back();
+                }
+                // Optional: Show a success toast here if you want
+                toast("Update created successfully!");
+            },
+        });
     };
     return (
         <form
@@ -182,16 +192,30 @@ export default function PostCreate({
                             </Badge>
                         </div>
                     </div>
-                    <Button
-                        type="submit"
-                        disabled={
-                            aiMutation.isPending ||
-                            (data.body && data.title ? false : true)
-                        }
-                        className={isMobile ? "" : "hidden"}
-                    >
-                        Post
-                    </Button>
+                    {actionStatus && (
+                        <Button
+                            type="submit"
+                            disabled={
+                                aiMutation.isPending ||
+                                (data.body && data.title ? false : true)
+                            }
+                            className={isMobile ? "" : "hidden"}
+                        >
+                            Update
+                        </Button>
+                    )}
+                    {!actionStatus && (
+                        <Button
+                            type="submit"
+                            disabled={
+                                aiMutation.isPending ||
+                                (data.body && data.title ? false : true)
+                            }
+                            className={isMobile ? "" : "hidden"}
+                        >
+                            Post
+                        </Button>
+                    )}
                 </div>
 
                 {/* This Show the Error Message of Ai gen request */}
@@ -318,7 +342,6 @@ export default function PostCreate({
                         type="submit"
                         className={isMobile ? "hidden" : ""}
                         disabled={data.body && data.title ? false : true}
-
                     >
                         Update
                     </Button>

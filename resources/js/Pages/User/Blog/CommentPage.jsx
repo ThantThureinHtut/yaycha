@@ -31,7 +31,7 @@ import usePostEcho from "@/Components/Hooks/usePostEcho.jsx";
 
 export default function CommentPage({ post: initialPost, comments }) {
     const { auth } = usePage().props;
-    const [ post, setPost] = useState(initialPost)
+    const [post, setPost] = useState(initialPost);
     const [isPressed, setPressed] = useState(
         post.likes.some(
             (like) => like.post_id === post.id && like.like_id === auth.user.id
@@ -132,15 +132,30 @@ export default function CommentPage({ post: initialPost, comments }) {
         }
     };
 
-    usePostEcho(setPost)
+    usePostEcho(setPost);
     return (
         <div className="container mx-auto md:w-full lg:w-1/2 px-3 relative">
             <div className="sticky top-0 bg-background rounded-b z-50 ">
                 <div className="flex items-center justify-between py-2">
                     <div className="flex items-center gap-2.5">
-                        <Link href="/home" className="text-primary">
+                        <div
+                            onClick={() => {
+                                /**
+                     * 1. window.history.back() (The Time Machine)
+                            Who runs it? The Browser (JavaScript).
+
+                            What it does: It simulates clicking the Back Button in your browser.
+
+                            Why it saves your scroll: The browser automatically saves a "snapshot" of where you were (scroll position, data) before you left the page. When you run this command, it restores that snapshot exactly as you left it.
+
+                            Best for: "Cancel" buttons or "Return" buttons where you want to go back to exactly where you were.
+                     */
+                                window.history.back();
+                            }}
+                            className="text-primary"
+                        >
                             <ChevronLeft size={30} />
-                        </Link>
+                        </div>
                         <div>
                             <Avatar>
                                 <AvatarImage src={post.user.avatar_url} />
@@ -163,7 +178,10 @@ export default function CommentPage({ post: initialPost, comments }) {
                 </div>
             </div>
 
-            <div className="px-1  text-justify whitespace-pre-wrap" onClick={viewSumbitHandler}>
+            <div
+                className="px-1  text-justify whitespace-pre-wrap"
+                onClick={viewSumbitHandler}
+            >
                 {post.description}
             </div>
 

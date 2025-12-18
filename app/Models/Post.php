@@ -33,7 +33,7 @@ class Post extends Model
     protected function likesCountFormatted(): Attribute
     {
         return Attribute::make(
-            get: fn() => Number::abbreviate($this->likes_count)
+            get: fn() => Number::abbreviate($this->likes_count )
         );
     }
     protected function viewsCountFormatted(): Attribute {

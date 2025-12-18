@@ -1,8 +1,9 @@
+import PostCreate from "@/Components/Posts/PostCreate";
 
-export default function PostEditPage() {
+export default function PostEditPage({post}) {
   return (
-    <div>
-        <h1>Edit</h1>
+    <div className="m-4">
+        <PostCreate postData={post} action="Update"/>
     </div>
   )
 }

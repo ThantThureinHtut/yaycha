@@ -37,9 +37,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 export default function PostUpdate({
     post,
-    likeSubmitHandler,
-    isPressed,
-    setPost,
+    likeSubmitHandler = null,
+    isPressed = null,
+    setPost = null,
 }) {
     const { auth } = usePage().props;
     const { isAi, isUpdateOpen, setUpdateOpen } = useTheme();
@@ -57,6 +57,10 @@ export default function PostUpdate({
     const postDeleteHandler = () => {
         router.post(route("post.delete"), {
             post_id: post.id,
+        } , {
+            // This Two make don't go restart the page and after you delete the post , don't go up and stay the same position before you delete
+            preserveScroll: true,
+            preserveState: true
         });
     };
 

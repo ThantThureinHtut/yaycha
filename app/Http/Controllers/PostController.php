@@ -100,7 +100,8 @@ class PostController extends Controller
     }
 
     public function edit($id){
-        return Inertia::render("User/Blog/PostEditPage");
+        $post = Post::where('id' , $id)->withCount(['likes' , 'comments' , 'views'])->first();
+        return Inertia::render("User/Blog/PostEditPage" , ["post" => $post]);
     }
     public function update(Request $request)
     {
@@ -118,4 +119,5 @@ class PostController extends Controller
         isset($request->title) ? $post->update(['title' => $request->title]) : $post->update(['description' => $request->body]);
         return  redirect()->back();
     }
+
 }
