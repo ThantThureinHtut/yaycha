@@ -42,10 +42,9 @@ class AdminVerificationsController extends Controller
 
         $userData = $userSearchData->paginate(10);
         // 2. USE 'through' to transform the data and add image URLs
-        $userData->through(function ($user) {
+        $userData->map(function ($user) {
             // Check if verifiedacountinfo exists to avoid errors
             if ($user->verifiedacountinfo) {
-
                 // Add Government Image URL
                 $user->verifiedacountinfo->government_image = $user->verifiedacountinfo->government_image
                     ? asset('storage/' . $user->verifiedacountinfo->government_image)
