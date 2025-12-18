@@ -241,7 +241,7 @@ export default function AdminVerifications({ users, filters = null }) {
                                                                         Id
                                                                     </h1>
                                                                     <img
-                                                                        src={user.verifiedacountinfo.government_image ? `/storage/${user.verifiedacountinfo.government_image}` : "https://placehold.co/600x400"}
+                                                                        src={user.verifiedacountinfo.government_image ? `https://yaycha.blog/storage/storage/${user.verifiedacountinfo.government_image}` : "https://placehold.co/600x400"}
                                                                         alt=""
                                                                         className="border border-black w-full object-cover"
                                                                     />
@@ -252,7 +252,7 @@ export default function AdminVerifications({ users, filters = null }) {
                                                                         Id
                                                                     </h1>
                                                                     <img
-                                                                        src={user.verifiedacountinfo.selfie_image ? `/storage/${user.verifiedacountinfo.selfie_image}` : "https://placehold.co/600x400"}
+                                                                        src={user.verifiedacountinfo.selfie_image ? `https://yaycha.blog/storage/storage/${user.verifiedacountinfo.selfie_image}` : "https://placehold.co/600x400"}
                                                                         alt=""
                                                                          className="border border-black w-full object-cover"
                                                                     />

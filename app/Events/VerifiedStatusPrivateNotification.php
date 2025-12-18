@@ -18,10 +18,11 @@ class VerifiedStatusPrivateNotification implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public $verifiedStatus;
-    public function __construct(VerifiedAccountInfo $verifiedStatus)
+
+    public $user_id;
+    public function __construct($user_id)
     {
-        $this->verifiedStatus = $verifiedStatus;
+        $this->user_id = $user_id;
     }
 
     /**
@@ -32,7 +33,15 @@ class VerifiedStatusPrivateNotification implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel("verifiedStatus.{$this->verifiedStatus->user_id}"),
+            new PrivateChannel("verifiedStatus.{$this->user_id}"),
         ];
+    }
+    public function broadcastWith()
+    {
+        $status = VerifiedAccountInfo::where('user_id' , $this->user_id)->first();
+        return [
+                'status' => $status ? "success" : "rejected"// Make sure this is exactly 'success' or 'rejected'
+        ];
+
     }
 }

@@ -217,9 +217,9 @@ export default function usePostEcho(setPosts, filterUserId = null) {
         // Verified Status Private Noti
         statusChannel.listen("VerifiedStatusPrivateNotification", (e) => {
             const iconCheck = () => {
-                if (e.verifiedStatus.status == "success") {
+                if (e.status == "success") {
                     return "👍";
-                } else if (e.verifiedStatus.status == "rejected") {
+                } else if (e.status == "rejected") {
                     return "🖕";
                 }
             };
@@ -238,7 +238,7 @@ export default function usePostEcho(setPosts, filterUserId = null) {
                 }
             };
 
-            toast(`Your verification is ${e.verifiedStatus.status}`, {
+            toast(`Your verification is ${e.status}`, {
                 icon: iconCheck(),
                 style: {
                     borderRadius: "10px",
@@ -246,7 +246,7 @@ export default function usePostEcho(setPosts, filterUserId = null) {
                     color: themeChangeFn() ? "#fff" : "#333",
                     border: "1px solid", // Define thickness and type
                     borderColor:
-                        e.verifiedStatus.status == "success"
+                        e.status == "success"
                             ? "#4ade80"
                             : "#f87171",
                 },

@@ -38,6 +38,7 @@ class VerifiedAccountInfoController extends Controller
         $info = VerifiedAccountInfo::where('user_id', $request->user_id)->firstOrFail();
         $bluemark = Bluemark::where('user_id' , $request->user_id)->first();
         if($request->status == 'rejected'){
+
             if(isset($info->government_image) && Storage::disk("public")->exists($info->government_image)){
                 Storage::disk("public")->delete($info->government_image);
             }
@@ -49,6 +50,9 @@ class VerifiedAccountInfoController extends Controller
             }
 
             $info->delete();
+            VerifiedStatusPrivateNotification::dispatch($request->user_id);
+
+
         }
 
         if($request->status == "pending"){
@@ -57,21 +61,19 @@ class VerifiedAccountInfoController extends Controller
             }
         }
 
-        if($request->status == "success"){
+
+        $info->update([
+            'status' => $request->status
+        ]);
+
+        if ($info->status == "success" && $request->status == "success") {
             if(!isset($bluemark)){
                 Bluemark::create([
                     'bluemark' => true,
                     'user_id' => $request->user_id
                 ]);
             }
-        }
-
-        $info->update([
-            'status' => $request->status
-        ]);
-
-        if ($info->status == "rejected" || $info->status == "success") {
-            VerifiedStatusPrivateNotification::dispatch($info);
+            VerifiedStatusPrivateNotification::dispatch($request->user_id);
         }
         return redirect()->route("admin.verifications");
     }

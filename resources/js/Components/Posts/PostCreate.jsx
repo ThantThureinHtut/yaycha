@@ -290,7 +290,7 @@ export default function PostCreate({
                                                 { id: auth.user.id }
                                             )}
                                         >
-                                            <AlertDialogAction className="bg-blue-500 text-white hover:bg-blue-600">
+                                            <AlertDialogAction className="bg-blue-500 text-white hover:bg-blue-600 w-full">
                                                 verified now
                                             </AlertDialogAction>
                                         </Link>
