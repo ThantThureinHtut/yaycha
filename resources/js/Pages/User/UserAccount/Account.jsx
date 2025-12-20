@@ -125,7 +125,7 @@ export default function AccountInformation({ posts: initialPosts }) {
                                                                                             }
                                                                                         />
                                                                                     </Avatar>
-                                                                                    <div className="flex flex-col">
+                                                                                    <div className="flex flex-col  text-xs sm:text-sm">
                                                                                         <h1 className="flex gap-1">
                                                                                             {
                                                                                                 follow.name
@@ -148,6 +148,7 @@ export default function AccountInformation({ posts: initialPosts }) {
                                                                                 <div>
                                                                                     <Button
                                                                                         variant="outline"
+                                                                                        className=" text-xs sm:text-sm"
                                                                                         onClick={() =>
                                                                                             followHandler(
                                                                                                 follow.id
@@ -206,7 +207,7 @@ export default function AccountInformation({ posts: initialPosts }) {
                                                                             }
                                                                         >
                                                                             <div className="flex items-center justify-between mb-3">
-                                                                                <div className="flex items-center gap-4">
+                                                                                <div className="flex items-center gap-2">
                                                                                     <Avatar className="size-10">
                                                                                         <AvatarImage
                                                                                             src={
@@ -214,7 +215,7 @@ export default function AccountInformation({ posts: initialPosts }) {
                                                                                             }
                                                                                         />
                                                                                     </Avatar>
-                                                                                    <div className="flex flex-col">
+                                                                                    <div className="flex flex-col text-xs sm:text-sm ">
                                                                                         <h1 className="flex gap-1">
                                                                                             {
                                                                                                 follow.name
@@ -237,6 +238,7 @@ export default function AccountInformation({ posts: initialPosts }) {
                                                                                 <div>
                                                                                     <Button
                                                                                         variant="outline"
+                                                                                        className=" text-xs sm:text-sm"
                                                                                         onClick={() =>
                                                                                             followHandler(
                                                                                                 follow.id
