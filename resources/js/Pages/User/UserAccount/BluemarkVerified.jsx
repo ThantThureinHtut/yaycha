@@ -33,23 +33,11 @@ export default function BluemarkVerified() {
         selfieImage: null,
     });
 
-
     const handleFileChange = (e, fileName, setPreviewFun, setError) => {
         const file = e.target.files[0];
         if (file) {
-            const fileSize = file.size;
-            const maxSizeBytes = 1 * 1024 * 1024;
-            if (fileSize > maxSizeBytes) {
-                setError("File Size can't over 1mb");
-            } else {
-                setError("");
-                seterrorGovernmentPreview("");
-                seterrorSelfiePreview("");
-                setData(fileName, file);
-                setPreviewFun(URL.createObjectURL(file));
-            }
-        } else {
-            setError("");
+            setData(fileName, file);
+            setPreviewFun(URL.createObjectURL(file));
         }
     };
     const nameValidFunction = (data) => {
@@ -77,10 +65,11 @@ export default function BluemarkVerified() {
                     className="container mx-auto w-full md:w-1/2 flex justify-center items-center min-h-screen"
                     encType="multipart/form-data"
                 >
-
                     <Card>
                         <CardHeader className="">
-                             <Link href="/home" className="p-1">Go back</Link>
+                            <Link href="/home" className="p-1">
+                                Go back
+                            </Link>
                             <div className="flex items-center ju gap-1  text-blue-500 text-xl font-bold">
                                 <Verified />
                                 <span>Verified Account</span>
@@ -123,7 +112,7 @@ export default function BluemarkVerified() {
                                 {/* Government Input And Preview */}
                                 <div className="flex flex-col gap-2 overflow-hidden">
                                     <div className="text-red-500 text-sm">
-                                        <div>{errorGovernmentPreview}</div>
+                                        <div>{errors.governmentImage}</div>
                                     </div>
                                     <InputGroup>
                                         <InputGroupAddon>
@@ -157,7 +146,7 @@ export default function BluemarkVerified() {
                                 {/* Selfie Input And Preview */}
                                 <div className="flex flex-col gap-2 overflow-hidden">
                                     <div className="text-red-500 text-sm">
-                                        <div>{errorSelfiePreview}</div>
+                                        <div>{errors.selfieImage}</div>
                                     </div>
                                     <InputGroup>
                                         <InputGroupAddon>
@@ -282,7 +271,6 @@ export default function BluemarkVerified() {
                                         the platform safe for everyone.
                                     </p>
                                 </div>
-
                             </CardDescription>
                         </CardContent>
                         <CardFooter>

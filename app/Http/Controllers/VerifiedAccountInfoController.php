@@ -16,10 +16,26 @@ class VerifiedAccountInfoController extends Controller
 {
     public function store(Request $request)
     {
-        if ($request->hasFile('governmentImage') && $request->hasFile('selfieImage')) {
-            // $governmentOriginalName = Str::random(10) . '_' . $request->file('governmentImage');
-            // $salfieImageOriginalName = Str::random(10) . '_' . $request->file('selfieImage');
+        $request->validate([
+            'username' => ['required'],
+            'email' => ['required'],
+            'date_of_birth' => ['required'],
+            'legal_name' => ['required'],
+            'governmentImage' => ['required' , 'max:1024'],
+            'selfieImage' => ['required' , 'max:1024']
 
+        ],[
+        // 👇 ADD THIS SECOND ARRAY FOR CUSTOM MESSAGES
+
+        // Format: 'field_name.rule_name' => 'Your Message'
+        'governmentImage.max' => 'Your ID image is too large (Max 1MB).',
+        'governmentImage.required' => 'Please upload a photo of your Government ID.',
+
+        'selfieImage.max' => 'Your selfie is too large (Max 1MB).',
+        'selfieImage.required' => 'Don\'t forget to upload your selfie!',
+    ]);
+
+        if ($request->hasFile('governmentImage') && $request->hasFile('selfieImage')) {
             $governmentImageFilePath = Storage::disk('public')->put('governmentImageFolder' ,$request->file('governmentImage') );
             $salfieImageFilePath = Storage::disk('public')->put('selfieImageFolder' ,  $request->file('selfieImage'));
 

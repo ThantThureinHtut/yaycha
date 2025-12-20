@@ -12,9 +12,18 @@ import {
     CardHeader,
     CardTitle,
 } from "@/Components/ui/card";
-
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/Components/ui/dialog";
 import { Separator } from "@/Components/ui/separator";
-import { Link, usePage } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
 import { ArrowLeft, Edit } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
@@ -23,9 +32,20 @@ import BlueMark from "@/Components/BlueMark";
 export default function AccountInformation({ posts: initialPosts }) {
     const [posts, setPosts] = useState(initialPosts);
     const { auth } = usePage().props;
-    const [user, setUser] = useState(auth.user);
-
-    usePostEcho(setPosts, user.id);
+    const isFollow = auth.user.followers.some((follower) => {
+        return auth.user.followings.some(
+            (following) => following.id === follower.id
+        );
+    });
+    usePostEcho(setPosts, auth.id);
+    // Follow Submit Function
+    const followHandler = (id) => {
+        router.post(
+            route("account.follow.store", id),
+            {},
+            { preserveScroll: true, preserveState: true }
+        );
+    };
     return (
         <div className="container mx-auto">
             <div className="hidden sm:block">
@@ -63,21 +83,177 @@ export default function AccountInformation({ posts: initialPosts }) {
                                         <CardDescription className="text-sm sm:text-md">
                                             <div>
                                                 <div className="flex items-center gap-2">
-                                                    <span>
-                                                        {user.followers_count ||
-                                                            0}{" "}
-                                                        followers
-                                                    </span>
+                                                    {/* Followers */}
+                                                    <Dialog>
+                                                        <DialogTrigger>
+                                                            {" "}
+                                                            <span>
+                                                                {auth.user
+                                                                    .followers_count_formatted ||
+                                                                    0}{" "}
+                                                                followers
+                                                            </span>
+                                                        </DialogTrigger>
+                                                        <DialogContent className="min-h-screen h-full overflow-y-auto custom-scrollbar flex flex-col">
+                                                            <DialogHeader>
+                                                                <DialogTitle className="flex items-start">
+                                                                    Your
+                                                                    followers (
+                                                                    {auth.user
+                                                                        .followers_count_formatted ||
+                                                                        0}
+                                                                    )
+                                                                </DialogTitle>
+                                                                <DialogDescription className="hidden"></DialogDescription>
+                                                            </DialogHeader>
+                                                            <div>
+                                                                {auth.user.followers.map(
+                                                                    (
+                                                                        follow
+                                                                    ) => (
+                                                                        <div
+                                                                            key={
+                                                                                follow.id
+                                                                            }
+                                                                        >
+                                                                            <div className="flex items-center justify-between mb-3">
+                                                                                <div className="flex items-center gap-4">
+                                                                                    <Avatar className="size-10">
+                                                                                        <AvatarImage
+                                                                                            src={
+                                                                                                follow?.avatar_url
+                                                                                            }
+                                                                                        />
+                                                                                    </Avatar>
+                                                                                    <div className="flex flex-col">
+                                                                                        <h1 className="flex gap-1">
+                                                                                            {
+                                                                                                follow.name
+                                                                                            }
+                                                                                            <b className="text-blue-500">
+                                                                                                (@
+                                                                                                {
+                                                                                                    follow.username
+                                                                                                }
+                                                                                                )
+                                                                                            </b>
+                                                                                        </h1>
+                                                                                        <h2>
+                                                                                            {
+                                                                                                follow.email
+                                                                                            }
+                                                                                        </h2>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <Button
+                                                                                        variant="outline"
+                                                                                        onClick={() =>
+                                                                                            followHandler(
+                                                                                                follow.id
+                                                                                            )
+                                                                                        }
+                                                                                    >
+                                                                                        {isFollow
+                                                                                            ? "Unfollow"
+                                                                                            : "Follow back"}
+                                                                                    </Button>
+                                                                                </div>
+                                                                            </div>
+                                                                            <Separator />
+                                                                        </div>
+                                                                    )
+                                                                )}
+                                                            </div>
+                                                        </DialogContent>
+                                                    </Dialog>
+
                                                     <Separator
                                                         orientation="vertical"
                                                         className="h-4"
                                                     />
-                                                    <span>
-                                                        {auth.user
-                                                            ?.followings_count ||
-                                                            0}{" "}
-                                                        followings
-                                                    </span>
+                                                    {/* Followings */}
+                                                    <Dialog>
+                                                        <DialogTrigger>
+                                                            {" "}
+                                                            <span>
+                                                                {auth.user
+                                                                    ?.followings_count_formatted ||
+                                                                    0}{" "}
+                                                                followings
+                                                            </span>
+                                                        </DialogTrigger>
+                                                        <DialogContent className="min-h-screen h-full overflow-y-auto custom-scrollbar flex flex-col">
+                                                            <DialogHeader>
+                                                                <DialogTitle className="flex items-start">
+                                                                    Your
+                                                                    followings (
+                                                                    {auth.user
+                                                                        .followings_count_formatted ||
+                                                                        0}
+                                                                    )
+                                                                </DialogTitle>
+                                                                <DialogDescription className="hidden"></DialogDescription>
+                                                            </DialogHeader>
+                                                            <div>
+                                                                {auth.user.followings.map(
+                                                                    (
+                                                                        follow
+                                                                    ) => (
+                                                                        <div
+                                                                            key={
+                                                                                follow.id
+                                                                            }
+                                                                        >
+                                                                            <div className="flex items-center justify-between mb-3">
+                                                                                <div className="flex items-center gap-4">
+                                                                                    <Avatar className="size-10">
+                                                                                        <AvatarImage
+                                                                                            src={
+                                                                                                follow?.avatar_url
+                                                                                            }
+                                                                                        />
+                                                                                    </Avatar>
+                                                                                    <div className="flex flex-col">
+                                                                                        <h1 className="flex gap-1">
+                                                                                            {
+                                                                                                follow.name
+                                                                                            }
+                                                                                            <b className="text-blue-500">
+                                                                                                (@
+                                                                                                {
+                                                                                                    follow.username
+                                                                                                }
+                                                                                                )
+                                                                                            </b>
+                                                                                        </h1>
+                                                                                        <h2>
+                                                                                            {
+                                                                                                follow.email
+                                                                                            }
+                                                                                        </h2>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <Button
+                                                                                        variant="outline"
+                                                                                        onClick={() =>
+                                                                                            followHandler(
+                                                                                                follow.id
+                                                                                            )
+                                                                                        }
+                                                                                    >
+                                                                                       {!isFollow ? "Unfollow" : "Follow"}
+                                                                                    </Button>
+                                                                                </div>
+                                                                            </div>
+                                                                            <Separator />
+                                                                        </div>
+                                                                    )
+                                                                )}
+                                                            </div>
+                                                        </DialogContent>
+                                                    </Dialog>
                                                 </div>
                                                 <div>{auth.user?.bio}</div>
                                             </div>
@@ -94,7 +270,9 @@ export default function AccountInformation({ posts: initialPosts }) {
                         </CardHeader>
                         <Separator className="mb-8" />
                         <CardContent className="p-0 md:p-6">
-                            <CardTitle className="pl-4 md:pl-0">Your Posts</CardTitle>
+                            <CardTitle className="pl-4 md:pl-0">
+                                Your Posts
+                            </CardTitle>
                             <div className="rounded mt-4 mx-auto">
                                 <PostCreateBox />
                             </div>
