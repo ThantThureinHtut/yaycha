@@ -35,7 +35,7 @@ import { Badge } from "@/Components/ui/badge";
 import BlueMark from "../BlueMark";
 import { Separator } from "../ui/separator";
 import { Link, router, useForm, usePage } from "@inertiajs/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ExpandableText from "./ExpandableText";
 import { Button } from "../ui/button";
 import { Avatar, AvatarImage } from "../ui/avatar";
@@ -49,12 +49,17 @@ import { useTheme } from "@/src/Context/ThemeContext";
 export default function Blog({ post: initalPost }) {
     const [post, setPost] = useState(initalPost);
     const { auth } = usePage().props;
-    const { isAi, isUpdateOpen, setUpdateOpen} = useTheme();
+
     const [isPressed, setPressed] = useState(
         post.likes.some(
             (like) => like.post_id === post.id && like.like_id === auth.user.id
         )
     );
+    // To Updat ethe setPost if the user InitalPost
+    useEffect(() => {
+        setPost(initalPost);
+    }, [initalPost]);
+
     const { viewIn, likeIn } = usePostInteractions(
         post,
         auth,

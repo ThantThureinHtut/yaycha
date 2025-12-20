@@ -274,7 +274,7 @@ export default function usePostEcho(setPosts, filterUserId = null) {
             if (channelName) window.Echo.leave(channelName);
             if (followChannelName) window.Echo.leave(followChannelName);
             if (likeChannelName) window.Echo.leave(likeChannelName);
-            if (statusChannelName) window.Echo.leave(likeChannelName);
+            if (statusChannelName) window.Echo.leave(statusChannelName);
         };
     }, [filterUserId]);
 }

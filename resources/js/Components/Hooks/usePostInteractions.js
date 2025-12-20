@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import formatNumber from "../Utils/formatNumber";
+import axios from "axios";
 const usePostInteractions = (post, auth, isPressed , setPressed) => {
      const viewMutation = useMutation({
         mutationFn: () => {

@@ -88,12 +88,7 @@ export default function PostUpdate({
         );
     };
 
-    // Post Edit Function
-    // const postEditHandler = () => {
-    //     if (isMobile) {
-    //         router.get(route("post.edit.show", { id: post.id }));
-    //     }
-    // };
+
 
     // Follow Submit Function
     const followHandler = () => {
