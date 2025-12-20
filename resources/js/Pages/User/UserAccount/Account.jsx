@@ -245,7 +245,7 @@ export default function AccountInformation({ posts: initialPosts }) {
                                                                                             )
                                                                                         }
                                                                                     >
-                                                                                       {!isFollow ? "Unfollow" : "Follow"}
+                                                                                       {!isFollow ? "Follow" : "Unfollow" }
                                                                                     </Button>
                                                                                 </div>
                                                                             </div>
