@@ -14,7 +14,7 @@ import {
 } from "@/Components/ui/card";
 
 import { Separator } from "@/Components/ui/separator";
-import { Link, usePage } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
 import { ArrowLeft, Edit } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
@@ -40,7 +40,7 @@ export default function AccountInformation({
     // Follow Unfollow Mutation
     const followingMutation = useMutation({
         mutationFn: () => {
-            return axios.post(route("account.follow.store", followingUser.id));
+            return router.post(route("account.follow.store" , followingUser.id) , {} ,{preserveScroll:true, preserveState:true})
         },
         onMutate: () => {
             setIsFollow((prev) => !prev);
@@ -58,7 +58,7 @@ export default function AccountInformation({
     return (
         <div className="container mx-auto">
             <div className="hidden sm:block">
-                <Header />
+                <Header  />
             </div>
             <div>
                 <div className="bg-secondary p-4 shadow-sm block sm:hidden">

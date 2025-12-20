@@ -7,15 +7,17 @@ export default function Comments({ comment, repyIdSubmitHandler , depth = 0 }) {
     const MAX_LIMIT = 2
 
     return (
-        <div key={comment.id} className="my-2">
+        <div key={comment.id} className="my-1">
             {/* Parent Comment  */}
             <div className="flex gap-2 ">
+                {/* Profile Avatar Image  */}
                 <div className="">
                     <Avatar className="size-9 ">
                         <AvatarImage src={comment?.user?.avatar_url} />
                     </Avatar>
                 </div>
                 <div>
+                    {/* This is commnet section */}
                     <div className="bg-secondary px-3 py-2 rounded-2xl">
 
                         <h1 className="text-sm">{comment?.user?.username}</h1>
@@ -26,8 +28,9 @@ export default function Comments({ comment, repyIdSubmitHandler , depth = 0 }) {
                         )}
 
                     </div>
-                    <div className="flex justify-between text-xs my-0.5 mx-4">
+                    <div className="flex gap-2 justify-between text-xs my-0.5 mx-4">
                         <span>{formatDate(comment.created_at)}</span>
+                        {/* When user click send the replied user data to the user */}
                         <span
                             onClick={() =>
                                 repyIdSubmitHandler({
@@ -45,6 +48,7 @@ export default function Comments({ comment, repyIdSubmitHandler , depth = 0 }) {
             </div>
 
             {/* Reply / Child Comment belongTo Parent */}
+            {/* This is check if the parent comment have the child tree comments run this code  */}
             <div className={depth < MAX_LIMIT ?  "mx-10" : "mx-0"}>
                 {hasReplies &&
                     comment.replies.map((comment) => (

@@ -48,14 +48,15 @@ export default function PostCreate({
     setPosts = null,
     action,
     postData = null,
+    setUpdateOpen = null,
+    setDrawerOpen = null,
 }) {
     const { auth } = usePage().props;
-    const { setAi, setOpen, setUpdateOpen } = useTheme();
+    const { setAi, setOpen } = useTheme();
     const isMobile = useIsMobile();
     // If login user have bluemark or not
     const blueMarkCheck = auth.user?.bluemark_boolean === true;
     const [isAiErrorMessage, setAiErrorMessage] = useState("");
-
     // This Check Where We call this componenet , if use the componenet from updatepost components , change the all function to update and edit
     const actionStatus = postData && action == "Update" ? true : false;
     const {
@@ -126,7 +127,7 @@ export default function PostCreate({
     const updatePostHandler = (e) => {
         e.preventDefault();
         // Do the optimistic ui updates
-        if (!actionStatus) {
+        if (actionStatus) {
             setPosts((prevPost) => {
                 return {
                     ...prevPost,
@@ -137,42 +138,46 @@ export default function PostCreate({
         }
 
         // This submit
-        post(route("post.update"), {
-            onSuccess: () => {
-                reset();
-                // ONLY close the modal if the post was successful
-                if (!isMobile) {
+        router.post(
+            route("post.update"),
+            {
+                post_id: data.post_id,
+                title: data.title,
+                body: data.body,
+            },
+            {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: () => {
+                    reset();
+
+                    // ONLY close the modal if the post was successful
                     // This make to close my dialog cuz don't use the original dialogclose tag so , we need to do our own.
                     setUpdateOpen(false);
-                } else {
-                    /**
-                     * 1. window.history.back() (The Time Machine)
-                            Who runs it? The Browser (JavaScript).
 
-                            What it does: It simulates clicking the Back Button in your browser.
-
-                            Why it saves your scroll: The browser automatically saves a "snapshot" of where you were (scroll position, data) before you left the page. When you run this command, it restores that snapshot exactly as you left it.
-
-                            Best for: "Cancel" buttons or "Return" buttons where you want to go back to exactly where you were.
-                     */
-                    window.history.back();
-                }
-                // Optional: Show a success toast here if you want
-                toast("Update created successfully!");
-            },
-        });
+                    // Optional: Show a success toast here if you want
+                    toast(`Update created successfully!`);
+                },
+            }
+        );
     };
     return (
         <form
             onSubmit={actionStatus ? updatePostHandler : createPostHandler}
-            className={`sm:max-w-xl w-full flex items-center justify-center gap-2 ${
+            className={`sm:max-w-xl w-full flex items-start  justify-center gap-2
+                ${
                 aiMutation.isPending ? "[&>button]:hidden cursor-wait" : ""
             }`}
         >
-            <div className="grid flex-1 gap-2">
+            <div className="grid flex-1 gap-2 ">
                 {/* Post User Image and Name */}
                 <div>
-                    <Link href="/home" className="md:hidden">
+                    {/* preserveScroll make if the user go back to the home page, it is stay at the position you left
+                        It is good , when you edit your post which i in the middle of the other post , so you don't want when you go back to home page
+                        which start from start, if you don't want want need to use preserveScroll , which snapshot the position before you go to edit page
+
+                    */}
+                    <Link href="/home" preserveScroll={true}  className="md:hidden">
                         <ArrowLeft />
                     </Link>
                 </div>
@@ -194,6 +199,7 @@ export default function PostCreate({
                     </div>
                     {actionStatus && (
                         <Button
+                            onClick={() => setDrawerOpen(false)}
                             type="submit"
                             disabled={
                                 aiMutation.isPending ||

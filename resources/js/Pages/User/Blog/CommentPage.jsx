@@ -13,7 +13,7 @@ import { Input } from "@/Components/ui/input";
 import { InputGroup, InputGroupInput } from "@/Components/ui/input-group";
 import { Separator } from "@/Components/ui/separator";
 import { Description } from "@headlessui/react";
-import { Link, usePage } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
 import {
     ArrowLeft,
     Eye,
@@ -110,7 +110,7 @@ export default function CommentPage({ post: initialPost, comments }) {
                 setLocalComments([...localComments, temp_reply]);
             }
 
-            axios.post(
+            router.post(
                 route("post.comments.store"),
                 {
                     post_id: reply.post_id,
@@ -206,7 +206,7 @@ export default function CommentPage({ post: initialPost, comments }) {
             {/* Comments Section */}
             <div className="mt-3 z-10">
                 <h1>comments</h1>
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col my-2">
                     {localComments?.map((comment) => (
                         <Comments
                             key={comment.id}

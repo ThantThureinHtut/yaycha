@@ -48,7 +48,7 @@ class ProfileController extends Controller
     {
 
         $posts = Post::with(['user:id,username,email,avatar_url,bio', 'likes', 'views', 'comments.user:id,username,avatar_url,bio']) // Load user and likes data efficiently
-            ->where('user_id' , $id)
+            ->where('user_id', $id)
             ->withCount(['likes', 'views', 'comments']) // Automatically counts likes as 'likes_count'
             ->latest()
             ->get();
@@ -94,7 +94,7 @@ class ProfileController extends Controller
             $request->user()->email_verified_at = null;
         }
 
-       $request->user()->save();
+        $request->user()->save();
 
         return Redirect::route('account.edit');
     }
@@ -104,25 +104,38 @@ class ProfileController extends Controller
      * Your Liked Post
      */
 
-    public function liked_show():Response
+    public function liked_show(): Response
     {
-           $posts = Auth::user()->likedPosts()->with(['user:id,username,email,avatar_url' , 'likes' , 'views']) // Load the author of the post
+        $posts = Auth::user()->likedPosts()->with(['user:id,username,email,avatar_url', 'likes', 'views']) // Load the author of the post
             ->withCount(['likes', 'views', 'comments'])
             ->latest() // Sort by when I liked them!
             ->get();
-        return Inertia::render('User/UserAccount/LikedPost', ['posts' => $posts]);
+        $user = User::where('id', Auth::user()->id)->withCount(['followers', 'followings'])->first();
+        $user->load([
+            'followers',
+            'followings',
+            'bluemark',
+            'verifiedacountinfo'
+        ]);
+        return Inertia::render('User/UserAccount/LikedPost', [
+            'posts' => $posts,
+            'auth' => [
+                'user' => $user
+            ]
+        ]);
     }
 
 
     /**
      * User Search
      */
-    public function search(Request $request):JsonResponse{
+    public function search(Request $request): JsonResponse
+    {
         $query = $request->input('query');
         $users = User::query()
-                ->where('name' , 'LIKE' , "%{$query}%")
-                ->orWhere('email' , 'LIKE' , "%{$query}}")
-                ->get();
+            ->where('name', 'LIKE', "%{$query}%")
+            ->orWhere('email', 'LIKE', "%{$query}}")
+            ->get();
         return response()->json([
             'users' => $users
         ]);

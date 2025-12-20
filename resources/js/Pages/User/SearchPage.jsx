@@ -6,7 +6,7 @@ export default function SearchPage() {
     return (
         <div className="p-6 ">
             <div className="flex flex-col gap-4 lg:w-1/2 container mx-auto ">
-                <Link href="/home">
+                <Link href="/home" >
                     <ArrowLeft
                         size={30}
                         className="dark:bg-white dark:text-black bg-primary text-white  p-1 rounded-full"

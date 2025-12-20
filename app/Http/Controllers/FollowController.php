@@ -30,9 +30,7 @@ class FollowController extends Controller
 
         if ($existing) {
             $existing->delete();
-            return response()->json([
-                'status' => 'unfollowed'
-            ]);
+            return redirect()->back();
         } else {
             Follow::create([
                 'user_id' => $id,
@@ -43,9 +41,7 @@ class FollowController extends Controller
             FollowPrivateNotification::dispatch($followerUser, $id);
 
 
-             return response()->json([
-                'status' => 'followed'
-            ]);
+             return redirect()->back();
         }
 
 

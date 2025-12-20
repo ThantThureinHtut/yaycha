@@ -55,17 +55,16 @@ import axios from "axios";
 import PostCreate from "./PostCreate";
 import { useTheme } from "@/src/Context/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-export default function PostCreateBar({setPosts}) {
+export default function PostCreateBar({ setPosts }) {
     const isMobile = useIsMobile();
     const { auth } = usePage().props;
 
     // This Come from Post Create , i want to send the data from child route to parent route
     const { isAi, isOpen, setOpen } = useTheme();
 
-
     return (
-        <div className="flex items-center gap-2 lg:w-1/2 container mx-auto my-4 px-4 sm:px-0">
-            <Avatar>
+        <div className="flex items-center gap-2 lg:w-1/2 container mx-auto my-4 px-4 sm:px-0 -z-50">
+            <Avatar className="">
                 <AvatarImage src={auth.user?.avatar_url} />
             </Avatar>
 
@@ -74,11 +73,10 @@ export default function PostCreateBar({setPosts}) {
                 href={isMobile ? route("post.dashboard") : "/"}
                 className={isMobile ? "block w-full" : "hidden"}
             >
-                <InputGroup className={`${isMobile && " pointer-events-none"}`}>
-                    <InputGroupInput placeholder="What's on your mind?..." />
+                <InputGroup className={` ${isMobile && " pointer-events-none"} `}>
+                    <InputGroupInput placeholder="What's on your mind?..."  />
                 </InputGroup>
             </Link>
-
 
             {/* Desktop version Create post */}
             <div className="hidden md:block w-full">
@@ -96,7 +94,7 @@ export default function PostCreateBar({setPosts}) {
                 >
                     <DialogTrigger asChild>
                         <div className="flex items-center gap-2">
-                            <InputGroup>
+                            <InputGroup className="">
                                 <InputGroupInput placeholder="What's on your mind?..." />
                             </InputGroup>
                             <FilePlus className="bg-primary w-10 h-10 p-2 rounded-md" />
@@ -126,7 +124,7 @@ export default function PostCreateBar({setPosts}) {
                         {/* This is the Post Create Box Element and Ai Fun work here */}
 
                         {/* setPosts is come from Home page to make the Optimistic UI Update */}
-                        <PostCreate setPosts={setPosts}  />
+                        <PostCreate setPosts={setPosts} />
                     </DialogContent>
                 </Dialog>
             </div>

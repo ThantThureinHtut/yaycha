@@ -6,7 +6,16 @@ import {
     CardHeader,
     CardTitle,
 } from "@/Components/ui/card";
-
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/Components/ui/dialog";
 import {
     Plus,
     ArrowUp,
@@ -19,6 +28,7 @@ import {
     HeartIcon,
     Italic,
     MoreHorizontal,
+    Edit,
 } from "lucide-react";
 
 import { Badge } from "@/Components/ui/badge";
@@ -29,14 +39,17 @@ import { useState } from "react";
 import ExpandableText from "./ExpandableText";
 import { Button } from "../ui/button";
 import { Avatar, AvatarImage } from "../ui/avatar";
-import { set } from "nprogress";
 import formatNumber from "../Utils/formatNumber";
 import usePostInteractions from "../Hooks/usePostInteractions";
 import PostUpdate from "../Posts/PostUpdate";
+import PostCreate from "../Posts/PostCreate";
+import { useTheme } from "@/src/Context/ThemeContext";
+
 
 export default function Blog({ post: initalPost }) {
     const [post, setPost] = useState(initalPost);
     const { auth } = usePage().props;
+    const { isAi, isUpdateOpen, setUpdateOpen} = useTheme();
     const [isPressed, setPressed] = useState(
         post.likes.some(
             (like) => like.post_id === post.id && like.like_id === auth.user.id
@@ -65,14 +78,14 @@ export default function Blog({ post: initalPost }) {
 
     return (
         <div className="container flex flex-col gap-8 mx-auto my-3 md:w-full lg:w-1/2 ">
-            <Card className="rounded-none md:rounded-xl">
+            <Card className="rounded-none sm:rounded-xl ">
                 <CardHeader>
                     <div className="flex  items-center justify-between">
                         <div className="flex items-center  gap-3">
-                            <div>
+                            <div className="">
                                 {post.user.id === auth.user.id ? (
                                     <Link href={route("account.dashboard")}>
-                                        <Avatar>
+                                        <Avatar className="">
                                             <AvatarImage
                                                 src={post.user?.avatar_url}
                                             />
@@ -110,18 +123,19 @@ export default function Blog({ post: initalPost }) {
                                 </CardDescription>
                             </div>
                         </div>
-                          <div className="flex  items-center gap-1">
-                                <span className="flex items-center gap-2 p-2">
-                                    {post.views_count_formatted}
-                                    <Eye size={20} />
-                                </span>
-                                <PostUpdate
-                                    post={post}
-                                    likeSubmitHandler={likeSubmitHandler}
-                                    isPressed={isPressed}
-                                    setPost={setPost}
-                                />
-                            </div>
+                        <div className="flex  items-center gap-1">
+                            <span className="flex items-center gap-2 p-2">
+                                {post.views_count_formatted}
+                                <Eye size={20} />
+                            </span>
+                            <PostUpdate
+                                post={post}
+                                likeSubmitHandler={likeSubmitHandler}
+                                isPressed={isPressed}
+                                setPost={setPost}
+                            />
+
+                        </div>
                     </div>
                 </CardHeader>
                 <Separator className="mb-4" />
@@ -163,7 +177,6 @@ export default function Blog({ post: initalPost }) {
                     </Card>
                 </CardFooter>
             </Card>
-
         </div>
     );
 }

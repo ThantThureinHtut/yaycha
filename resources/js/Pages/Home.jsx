@@ -9,7 +9,6 @@ import PostCreatePage from "./User/Blog/PostCreatePage";
 export default function Home({ posts: initialPosts }) {
     const [posts, setPosts] = useState(initialPosts);
 
-
     usePostEcho(setPosts);
 
     // This make when real data is come i replace the fake data with new datas come form database
@@ -20,13 +19,13 @@ export default function Home({ posts: initialPosts }) {
 
 
     return (
-        <GuestLayout>
-            <div>
+        <GuestLayout >
+            <div >
                 {/* Pass the setPosts to the PostCreate Page to make the Optimistic UI Update post */}
-                <PostCreateBar setPosts={setPosts} action="Post" />
+                <PostCreateBar setPosts={setPosts} action="Post"  />
                 <div>
                     {posts.map((post) => (
-                    <Blog key={post.id} post={post}  />
+                    <Blog key={post.id} post={post} />
                 ))}
                 </div>
 
