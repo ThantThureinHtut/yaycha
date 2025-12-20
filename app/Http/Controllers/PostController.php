@@ -71,7 +71,7 @@ class PostController extends Controller
             'messages' => [
                 [
                     'role' => 'system',
-                    'content' => 'Generate a short, catchy, 6-word title for this post. Do not use quotes.'
+                    'content' => 'You are a title generator API. You do not speak. You only return the generated text. Read the provided text and generate one catchy, relevant title. Maximum length is 110 characters. Do not use quotes. Do not provide explanations.'
                 ],
                 [
                     'role' => 'user',
@@ -79,7 +79,7 @@ class PostController extends Controller
                 ]
             ],
             'temperature' => 0.7, // Creativity
-            'max_tokens' => 50,   // Speed limit
+            'max_tokens' => 40,   // Speed limit
         ]);
 
 
