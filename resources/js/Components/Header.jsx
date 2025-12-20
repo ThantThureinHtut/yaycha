@@ -45,7 +45,7 @@ export default function Header() {
     const { theme, setTheme } = useTheme();
     return (
         <div className="container mx-auto ">
-            <ul className="flex items-center justify-between shadow-sm dark:shadow-md py-3 px-6 rounded-sm bg-white z-50">
+            <ul className="flex items-center justify-between shadow-sm dark:shadow-md py-3 px-6 rounded-sm  bg-background bg z-50">
                 <li>
                     <Link href="/home" >
                         <Rabbit size={35} color="#facc13" />
