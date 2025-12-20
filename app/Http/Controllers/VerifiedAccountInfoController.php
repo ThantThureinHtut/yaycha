@@ -17,8 +17,8 @@ class VerifiedAccountInfoController extends Controller
     public function store(Request $request)
     {
         if ($request->hasFile('governmentImage') && $request->hasFile('selfieImage')) {
-            $governmentOriginalName = Str::random(10) . '_' . $request->file('governmentImage');
-            $salfieImageOriginalName = Str::random(10) . '_' . $request->file('selfieImage');
+            // $governmentOriginalName = Str::random(10) . '_' . $request->file('governmentImage');
+            // $salfieImageOriginalName = Str::random(10) . '_' . $request->file('selfieImage');
 
             $governmentImageFilePath = Storage::disk('public')->put('governmentImageFolder' ,$request->file('governmentImage') );
             $salfieImageFilePath = Storage::disk('public')->put('selfieImageFolder' ,  $request->file('selfieImage'));

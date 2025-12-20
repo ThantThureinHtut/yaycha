@@ -141,7 +141,7 @@ export default function usePostEcho(setPosts, filterUserId = null) {
                         t.visible
                             ? "animate-toast-enter"
                             : "animate-toast-leave"
-                    } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
+                    } max-w-md w-full bg-background shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
                 >
                     <div className="flex-1 w-0 p-4">
                         <div className="flex items-start">
@@ -156,13 +156,13 @@ export default function usePostEcho(setPosts, filterUserId = null) {
                                 <p className="text-md font-bold text-primary">
                                     Yaycha
                                 </p>
-                                <p className="mt-1 text-sm text-gray-800">
+                                <p className="mt-1 text-sm text-gray-800 dark:text-white">
                                    <span className="text-blue-500 font-bold">@{e.username}</span> is liked your post!!
                                 </p>
                             </div>
                         </div>
                     </div>
-                    <div className="flex border-l border-gray-200">
+                    <div className="flex border-l border-gray-200 dark:border-secondary">
                         <button
                             onClick={() => toast.dismiss(t.id)}
                             className="w-full border border-transparent rounded-none rounded-r-lg py-2 px-4 flex items-center justify-center text-sm font-medium text-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary"
@@ -181,7 +181,7 @@ export default function usePostEcho(setPosts, filterUserId = null) {
                         t.visible
                             ? "animate-toast-enter"
                             : "animate-toast-leave"
-                    } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
+                    } max-w-md w-full bg-background shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
                 >
                     <div className="flex-1 w-0 p-4">
                         <div className="flex items-start">
@@ -196,13 +196,13 @@ export default function usePostEcho(setPosts, filterUserId = null) {
                                 <p className="text-md font-bold text-primary">
                                     Yaycha
                                 </p>
-                                <p className="mt-1 text-sm text-gray-800">
+                                <p className="mt-1 text-sm text-gray-800 dark:text-white">
                                     <span className="text-blue-500 font-bold">@{e.username}</span> is following you!!
                                 </p>
                             </div>
                         </div>
                     </div>
-                    <div className="flex border-l border-gray-200">
+                    <div className="flex border-l border-gray-200 dark:border-secondary">
                         <button
                             onClick={() => toast.dismiss(t.id)}
                             className="w-full border border-transparent rounded-none rounded-r-lg py-2 px-4 flex items-center justify-center text-sm font-medium text-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary"
@@ -255,11 +255,7 @@ export default function usePostEcho(setPosts, filterUserId = null) {
         // 2. CLEANUP (Very Important)
         // When user leaves the page, cut the connection.
         return () => {
-            if (channel) {
-                channel.stopListening("PostViewEvent");
-                channel.stopListening("PostCreatedEvent");
-                channel.stopListening("PostLikeEvent");
-            }
+
             if (followChannel)
                 followChannel.stopListening("FollowPrivateNotification");
 
@@ -271,7 +267,7 @@ export default function usePostEcho(setPosts, filterUserId = null) {
                     "VerifiedStatusPrivateNotification"
                 );
             // Then leave the channel completely
-            if (channelName) window.Echo.leave(channelName);
+
             if (followChannelName) window.Echo.leave(followChannelName);
             if (likeChannelName) window.Echo.leave(likeChannelName);
             if (statusChannelName) window.Echo.leave(statusChannelName);

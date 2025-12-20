@@ -81,6 +81,19 @@ export default function PostCreate({
         setData,
         setError
     );
+    const themeChangeFn = () => {
+        const mediaQuery = window.matchMedia(
+            "(prefers-color-scheme: dark)"
+        ).matches;
+
+        if (localStorage.getItem("theme") == "system") {
+            return mediaQuery;
+        } else if (localStorage.getItem("theme") == "dark") {
+            return true;
+        } else if (localStorage.getItem("theme") == "light") {
+            return false;
+        }
+    };
     // Fetch the Ai Generate Title from the backend
     // Create the Post Submit
     const createPostHandler = (e) => {
@@ -118,7 +131,18 @@ export default function PostCreate({
                     setOpen(false);
                 }
                 // Optional: Show a success toast here if you want
-                toast("Post created successfully!");
+
+                // Optional: Show a success toast here if you want
+                toast("Post created successfully!", {
+                    icon: "👏",
+                    style: {
+                        borderRadius: "10px",
+                        background: themeChangeFn() ? "#333" : "#fff",
+                        color: themeChangeFn() ? "#fff" : "#333",
+                        border: "1px solid",
+                        borderColor: "#4ade80",
+                    },
+                });
             },
         });
     };
@@ -156,7 +180,16 @@ export default function PostCreate({
                     setUpdateOpen(false);
 
                     // Optional: Show a success toast here if you want
-                    toast(`Update created successfully!`);
+                    toast("Update created successfully!", {
+                        icon: "👏",
+                        style: {
+                            borderRadius: "10px",
+                            background: themeChangeFn() ? "#333" : "#fff",
+                            color: themeChangeFn() ? "#fff" : "#333",
+                            border: "1px solid",
+                            borderColor: "#4ade80",
+                        },
+                    });
                 },
             }
         );
@@ -165,9 +198,7 @@ export default function PostCreate({
         <form
             onSubmit={actionStatus ? updatePostHandler : createPostHandler}
             className={`sm:max-w-xl w-full flex items-start  justify-center gap-2
-                ${
-                aiMutation.isPending ? "[&>button]:hidden cursor-wait" : ""
-            }`}
+                ${aiMutation.isPending ? "[&>button]:hidden cursor-wait" : ""}`}
         >
             <div className="grid flex-1 gap-2 ">
                 {/* Post User Image and Name */}
@@ -177,7 +208,11 @@ export default function PostCreate({
                         which start from start, if you don't want want need to use preserveScroll , which snapshot the position before you go to edit page
 
                     */}
-                    <Link href="/home" preserveScroll={true}  className="md:hidden">
+                    <Link
+                        href="/home"
+                        preserveScroll={true}
+                        className="md:hidden"
+                    >
                         <ArrowLeft />
                     </Link>
                 </div>
