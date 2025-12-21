@@ -138,18 +138,13 @@ export default function AccountInformation({ posts: initialPosts }) {
                                                                                             />
                                                                                         </Avatar>
                                                                                         <div className="flex flex-col text-xs sm:text-sm">
-                                                                                            <h1 className="flex gap-1">
+                                                                                            <b className="text-blue-500">
+                                                                                                @
                                                                                                 {
-                                                                                                    follower.name
+                                                                                                    follower.username
                                                                                                 }
-                                                                                                <b className="text-blue-500">
-                                                                                                    (@
-                                                                                                    {
-                                                                                                        follower.username
-                                                                                                    }
-                                                                                                    )
-                                                                                                </b>
-                                                                                            </h1>
+                                                                                            </b>
+
                                                                                             <h2>
                                                                                                 {
                                                                                                     follower.email
@@ -174,7 +169,7 @@ export default function AccountInformation({ posts: initialPosts }) {
                                                                                         </Button>
                                                                                     </div>
                                                                                 </div>
-                                                                                <Separator className="my-4"/>
+                                                                                <Separator className="my-4" />
                                                                             </div>
                                                                         );
                                                                     }
@@ -230,19 +225,12 @@ export default function AccountInformation({ posts: initialPosts }) {
                                                                                         />
                                                                                     </Avatar>
                                                                                     <div className="flex flex-col text-xs sm:text-sm ">
-                                                                                        <h1 className="flex gap-1">
+                                                                                        <b className="text-blue-500">
+                                                                                            @
                                                                                             {
-                                                                                                follow.name
+                                                                                                follow.username
                                                                                             }
-                                                                                            <b className="text-blue-500">
-                                                                                                (@
-                                                                                                {
-                                                                                                    follow.username
-                                                                                                }
-
-                                                                                                )
-                                                                                            </b>
-                                                                                        </h1>
+                                                                                        </b>
                                                                                         <h2>
                                                                                             {
                                                                                                 follow.email
