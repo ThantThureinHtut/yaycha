@@ -12,10 +12,17 @@ import {
     CardHeader,
     CardTitle,
 } from "@/Components/ui/card";
-
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/Components/ui/dialog";
 import { Separator } from "@/Components/ui/separator";
 import { Link, router, usePage } from "@inertiajs/react";
-import { ArrowLeft, Edit } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import BlueMark from "@/Components/BlueMark";
@@ -27,27 +34,29 @@ export default function AccountInformation({
     const [posts, setPosts] = useState(initialPosts);
     const { auth } = usePage().props;
 
-    // Is Follow State
-    const [isFollow, setIsFollow] = useState(() => {
-        return auth.user.followings.some(
-            (following) => following.id === followingUser.id
-        );
-    });
+    // 1. Check if I (Logged in user) follow this Profile Owner (followingUser)
+    // This controls the Big "Follow/Unfollow" button next to their name
+    const isFollow = auth.user.followings.some(
+        (following) => following.id === followingUser.id
+    );
+
+    // ❌ REMOVED: const authIsFollow = ... (This was the bug)
 
     // Post Echo for Realtime Update
     usePostEcho(setPosts);
 
-    // Follow Unfollow Mutation
+    // Follow Unfollow Mutation (For the main profile button)
     const followingMutation = useMutation({
         mutationFn: () => {
-            return router.post(route("account.follow.store" , followingUser.id) , {} ,{preserveScroll:true, preserveState:true})
-        },
-        onMutate: () => {
-            setIsFollow((prev) => !prev);
+            return router.post(
+                route("account.follow.store", followingUser.id),
+                {},
+                { preserveScroll: true, preserveState: true }
+            );
         },
     });
 
-    // Follow Unfollow Submit Handler
+    // Follow Unfollow Submit Handler (For the main profile button)
     const followSubmitHandler = () => {
         followingUser.followers_count = isFollow
             ? followingUser.followers_count - 1
@@ -55,10 +64,19 @@ export default function AccountInformation({
         followingMutation.mutate();
     };
 
+    // Handler for the list buttons
+    const followHandler = (id) => {
+        router.post(
+            route("account.follow.store", id),
+            {},
+            { preserveScroll: true, preserveState: true }
+        );
+    };
+
     return (
         <div className="container mx-auto">
             <div className="hidden sm:block">
-                <Header  />
+                <Header />
             </div>
             <div>
                 <div className="bg-secondary p-4 shadow-sm block sm:hidden">
@@ -82,24 +100,20 @@ export default function AccountInformation({
                                             <div className="flex items-center gap-5">
                                                 <div className="flex items-center gap-2">
                                                     <span>
-                                                        @
-                                                        {
-                                                            followingUser?.username
-                                                        }
+                                                        @{followingUser?.username}
                                                     </span>
                                                     {followingUser?.bluemark_boolean && (
                                                         <BlueMark />
                                                     )}
                                                 </div>
+                                                {/* Main Profile Follow Button */}
                                                 <Button
                                                     variant={
                                                         isFollow
                                                             ? "outline"
                                                             : "default"
                                                     }
-                                                    onClick={
-                                                        followSubmitHandler
-                                                    }
+                                                    onClick={followSubmitHandler}
                                                 >
                                                     {isFollow
                                                         ? "Unfollow"
@@ -110,22 +124,135 @@ export default function AccountInformation({
                                         <CardDescription className="text-sm sm:text-md">
                                             <div>
                                                 <div className="flex items-center gap-2">
-                                                    <span>
-                                                        {followingUser.followers_count ||
-                                                            0}{" "}
-                                                        followers
-                                                    </span>
+                                                    {/* --- FOLLOWERS DIALOG --- */}
+                                                    <Dialog>
+                                                        <DialogTrigger>
+                                                            <span>
+                                                                {followingUser.followers_count_formatted ||
+                                                                    0}{" "}
+                                                                followers
+                                                            </span>
+                                                        </DialogTrigger>
+                                                        <DialogContent className="min-h-screen h-full overflow-y-auto custom-scrollbar flex flex-col">
+                                                            <DialogHeader>
+                                                                <DialogTitle className="flex items-start">
+                                                                    {followingUser.username}'s followers
+                                                                </DialogTitle>
+                                                                <DialogDescription className="hidden"></DialogDescription>
+                                                            </DialogHeader>
+                                                            <div>
+                                                                {followingUser.followers.map((follow) => {
+                                                                    // ✅ FIX 1: Calculate relationship for this specific person
+                                                                    const isAuthFollowing = auth.user.followings.some(
+                                                                        (myFollowing) => myFollowing.id === follow.id
+                                                                    );
+
+                                                                    return (
+                                                                        <div key={follow.id}>
+                                                                            <div className="flex items-center justify-between mb-3">
+                                                                                <div className="flex items-center gap-4">
+                                                                                    <Avatar className="size-10">
+                                                                                        <AvatarImage src={follow?.avatar_url} />
+                                                                                    </Avatar>
+                                                                                    <div className="flex flex-col text-xs sm:text-sm">
+                                                                                        <h1 className="flex gap-1">
+                                                                                            {follow.name}
+                                                                                            <b className="text-blue-500">
+                                                                                                (@{follow.username})
+                                                                                            </b>
+                                                                                        </h1>
+                                                                                        <h2>{follow.email}</h2>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div>
+                                                                                    {/* Don't show button if it's me */}
+                                                                                    {follow.id !== auth.user.id && (
+                                                                                        <Button
+                                                                                            variant="outline"
+                                                                                            className="text-xs sm:text-sm"
+                                                                                            onClick={() => followHandler(follow.id)}
+                                                                                        >
+                                                                                            {/* Use the local variable */}
+                                                                                            {isAuthFollowing ? "Unfollow" : "Follow"}
+                                                                                        </Button>
+                                                                                    )}
+                                                                                </div>
+                                                                            </div>
+                                                                            <Separator className="my-4" />
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        </DialogContent>
+                                                    </Dialog>
+
                                                     <Separator
                                                         orientation="vertical"
                                                         className="h-4"
                                                     />
-                                                    <span>
-                                                        {followingUser?.followings_count ||
-                                                            0}{" "}
-                                                        followings
-                                                    </span>
+
+                                                    {/* --- FOLLOWINGS DIALOG --- */}
+                                                    <Dialog>
+                                                        <DialogTrigger>
+                                                            <span>
+                                                                {followingUser?.followings_count_formatted ||
+                                                                    0}{" "}
+                                                                followings
+                                                            </span>
+                                                        </DialogTrigger>
+                                                        <DialogContent className="min-h-screen h-full overflow-y-auto custom-scrollbar flex flex-col">
+                                                            <DialogHeader>
+                                                                <DialogTitle className="flex items-start">
+                                                                    {followingUser.username}'s followings
+                                                                </DialogTitle>
+                                                                <DialogDescription className="hidden"></DialogDescription>
+                                                            </DialogHeader>
+                                                            <div>
+                                                                {followingUser.followings.map((follow) => {
+                                                                    // ✅ FIX 2: Calculate relationship for this specific person
+                                                                    const isAuthFollowing = auth.user.followings.some(
+                                                                        (myFollowing) => myFollowing.id === follow.id
+                                                                    );
+
+                                                                    return (
+                                                                        <div key={follow.id}>
+                                                                            <div className="flex items-center justify-between mb-3">
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <Avatar className="size-10">
+                                                                                        <AvatarImage src={follow?.avatar_url} />
+                                                                                    </Avatar>
+                                                                                    <div className="flex flex-col text-xs sm:text-sm ">
+                                                                                        <h1 className="flex gap-1">
+                                                                                            {follow.name}
+                                                                                            <b className="text-blue-500">
+                                                                                                (@{follow.username})
+                                                                                            </b>
+                                                                                        </h1>
+                                                                                        <h2>{follow.email}</h2>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div>
+                                                                                    {follow.id !== auth.user.id && (
+                                                                                        <Button
+                                                                                            variant="outline"
+                                                                                            className="text-xs sm:text-sm"
+                                                                                            onClick={() => followHandler(follow.id)}
+                                                                                        >
+                                                                                            {/* Use the local variable */}
+                                                                                            {isAuthFollowing ? "Unfollow" : "Follow"}
+                                                                                        </Button>
+                                                                                    )}
+                                                                                </div>
+                                                                            </div>
+                                                                            <Separator className="my-4" />
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        </DialogContent>
+                                                    </Dialog>
                                                 </div>
-                                                <div>{followingUser?.bio}</div>
+                                                <div>{auth.user?.bio}</div>
                                             </div>
                                         </CardDescription>
                                     </div>
