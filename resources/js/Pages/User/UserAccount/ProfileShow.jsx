@@ -170,7 +170,22 @@ export default function AccountInformation({
                                                                                 }
                                                                             >
                                                                                 <div className="flex items-center justify-between mb-3">
-                                                                                    <div className="flex items-center gap-4">
+                                                                                    <Link
+                                                                                        href={
+                                                                                            follow.id ==
+                                                                                            auth
+                                                                                                .user
+                                                                                                .id
+                                                                                                ? route(
+                                                                                                      "account.dashboard"
+                                                                                                  )
+                                                                                                : route(
+                                                                                                      "account.show",
+                                                                                                      follow.id
+                                                                                                  )
+                                                                                        }
+                                                                                        className="flex items-center gap-4"
+                                                                                    >
                                                                                         <Avatar className="size-10">
                                                                                             <AvatarImage
                                                                                                 src={
@@ -192,7 +207,7 @@ export default function AccountInformation({
                                                                                                 }
                                                                                             </h2>
                                                                                         </div>
-                                                                                    </div>
+                                                                                    </Link>
                                                                                     <div>
                                                                                         {/* Don't show button if it's me */}
                                                                                         {follow.id !==
@@ -272,7 +287,22 @@ export default function AccountInformation({
                                                                                 }
                                                                             >
                                                                                 <div className="flex items-center justify-between mb-3">
-                                                                                    <div className="flex items-center gap-2">
+                                                                                    <Link
+                                                                                        href={
+                                                                                            follow.id ==
+                                                                                            auth
+                                                                                                .user
+                                                                                                .id
+                                                                                                ? route(
+                                                                                                      "account.dashboard"
+                                                                                                  )
+                                                                                                : route(
+                                                                                                      "account.show",
+                                                                                                      follow.id
+                                                                                                  )
+                                                                                        }
+                                                                                        className="flex items-center gap-2"
+                                                                                    >
                                                                                         <Avatar className="size-10">
                                                                                             <AvatarImage
                                                                                                 src={
@@ -293,7 +323,7 @@ export default function AccountInformation({
                                                                                                 }
                                                                                             </h2>
                                                                                         </div>
-                                                                                    </div>
+                                                                                    </Link>
                                                                                     <div>
                                                                                         {follow.id !==
                                                                                             auth

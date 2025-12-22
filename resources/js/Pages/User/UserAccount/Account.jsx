@@ -129,7 +129,13 @@ export default function AccountInformation({ posts: initialPosts }) {
                                                                                 }
                                                                             >
                                                                                 <div className="flex items-center justify-between mb-3">
-                                                                                    <div className="flex items-center gap-4">
+                                                                                    <Link
+                                                                                        href={route(
+                                                                                            "account.show",
+                                                                                            follower.id
+                                                                                        )}
+                                                                                        className="flex items-center gap-4"
+                                                                                    >
                                                                                         <Avatar className="size-10">
                                                                                             <AvatarImage
                                                                                                 src={
@@ -151,7 +157,7 @@ export default function AccountInformation({ posts: initialPosts }) {
                                                                                                 }
                                                                                             </h2>
                                                                                         </div>
-                                                                                    </div>
+                                                                                    </Link>
                                                                                     <div>
                                                                                         <Button
                                                                                             variant="outline"
@@ -216,7 +222,13 @@ export default function AccountInformation({ posts: initialPosts }) {
                                                                             }
                                                                         >
                                                                             <div className="flex items-center justify-between mb-3">
-                                                                                <div className="flex items-center gap-2">
+                                                                                <Link
+                                                                                    href={route(
+                                                                                        "account.show",
+                                                                                        follow.id
+                                                                                    )}
+                                                                                    className="flex items-center gap-2"
+                                                                                >
                                                                                     <Avatar className="size-10">
                                                                                         <AvatarImage
                                                                                             src={
@@ -237,7 +249,7 @@ export default function AccountInformation({ posts: initialPosts }) {
                                                                                             }
                                                                                         </h2>
                                                                                     </div>
-                                                                                </div>
+                                                                                </Link>
                                                                                 <div>
                                                                                     <Button
                                                                                         variant="outline"
