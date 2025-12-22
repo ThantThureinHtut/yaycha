@@ -166,9 +166,7 @@ class User extends Authenticatable
     }
 
     public function followingUserPost(){
-        return $this->hasManyThrough(Post::class , Follow::class , 'follower_id' , 'user_id' , 'id' , 'user_id')
-                    ->withCount(['likes' , 'comments' , 'views'])
-                    ;
+        return $this->hasManyThrough(Post::class , Follow::class , 'follower_id' , 'user_id' , 'id' , 'user_id');
     }
     public function views()
     {

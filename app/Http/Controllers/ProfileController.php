@@ -128,9 +128,20 @@ class ProfileController extends Controller
      * Your Following post
      */
     public function following_show (){
-        $data =  Auth::user()->followingUserPost()->get();
-        logger($data->toArray());
-        return Inertia::render('User/UserAccount/FollowingUserPost');
+        $posts =  Auth::user()->followingUserPost()
+                                ->with('user:id,name,email,avatar_url,username' , 'views' , 'likes' )
+                                ->withCount(['likes' , 'views' , 'comments'])
+                                ->get();
+
+        $user = User::where('id', Auth::user()->id)->withCount(['followers', 'followings'])->first();
+        $user->load([
+            'followers',
+            'followings',
+            'bluemark',
+            'verifiedacountinfo'
+        ]);
+        logger($posts->toArray());
+        return Inertia::render('User/UserAccount/FollowingUserPost' , ['posts' => $posts , 'auth' => ['user' => $user]]);
     }
 
     /**

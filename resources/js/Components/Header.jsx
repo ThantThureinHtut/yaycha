@@ -199,7 +199,6 @@ export default function Header() {
                                             <Link
                                                 href={route(
                                                     "account.following.posts.show",
-                                                    { id: auth.user.id }
                                                 )}
                                                 className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded"
                                             >
