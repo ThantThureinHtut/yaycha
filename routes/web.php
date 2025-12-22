@@ -98,8 +98,10 @@ Route::group(['prefix' => '/account', 'middleware' => 'auth'], function () {
     Route::post('/follow/{id}', [FollowController::class, 'store'])->name('account.follow.store');
 
     // Liked Posts
-    Route::get('/liked/posts', [ProfileController::class, 'liked_show'])->name('acccount.liked.posts.show');
+    Route::get('/liked/posts', [ProfileController::class, 'liked_show'])->name('account.liked.posts.show');
 
+    // Following User Posts
+    Route::get("/followings/posts" , [ProfileController::class , 'following_show'])->name("account.following.posts.show");
     // Profile Edit
     Route::group(['prefix' => '/profile_edit'], function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('account.edit');

@@ -165,6 +165,11 @@ class User extends Authenticatable
             ->withTimestamps(); // If you want to know WHEN they liked it
     }
 
+    public function followingUserPost(){
+        return $this->hasManyThrough(Post::class , Follow::class , 'follower_id' , 'user_id' , 'id' , 'user_id')
+                    ->withCount(['likes' , 'comments' , 'views'])
+                    ;
+    }
     public function views()
     {
         return $this->hasMany(View::class);

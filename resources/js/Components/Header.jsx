@@ -29,6 +29,7 @@ import {
     Search,
     ShieldUser,
     Verified,
+    UserStar,
 } from "lucide-react";
 import { Label } from "@/Components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/Components/ui/radio-group";
@@ -47,7 +48,7 @@ export default function Header() {
         <div className="container mx-auto ">
             <ul className="flex items-center justify-between shadow-sm dark:shadow-md py-3 px-6 rounded-sm  bg-background bg z-50">
                 <li>
-                    <Link href="/home" >
+                    <Link href="/home">
                         <Rabbit size={35} color="#facc13" />
                     </Link>
                 </li>
@@ -182,7 +183,7 @@ export default function Header() {
                                         <li className="w-full">
                                             <Link
                                                 href={route(
-                                                    "acccount.liked.posts.show"
+                                                    "account.liked.posts.show"
                                                 )}
                                                 className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded"
                                             >
@@ -191,36 +192,55 @@ export default function Header() {
                                                     Liked Posts
                                                 </p>
                                             </Link>
+                                              <Separator />
                                         </li>
 
-                                          <li className="w-full">
+                                        <li className="w-full">
                                             <Link
                                                 href={route(
-                                                    "account.bluemark.verified.dashboard"
-                                                , {id: auth.user.id})}
+                                                    "account.following.posts.show",
+                                                    { id: auth.user.id }
+                                                )}
+                                                className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded"
+                                            >
+                                                <UserStar />
+                                                <p className="text-lg sm:text-sm">
+                                                    Following user posts
+                                                </p>
+                                            </Link>
+                                              <Separator />
+                                        </li>
+
+                                        <li className="w-full">
+                                            <Link
+                                                href={route(
+                                                    "account.bluemark.verified.dashboard",
+                                                    { id: auth.user.id }
+                                                )}
                                                 className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded"
                                             >
                                                 <Verified />
                                                 <p className="text-lg sm:text-sm">
                                                     Bluemark Verification
                                                 </p>
+
                                             </Link>
                                         </li>
-
                                         <li className="w-full">
-                                            {auth.user.role === ("superadmin" || "admin")  && (
-                                                    <Link
-                                                        href={route(
-                                                            "admin.dashboard"
-                                                        )}
-                                                        className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded"
-                                                    >
-                                                        <ShieldUser />
-                                                        <p className="text-lg sm:text-sm">
-                                                            Admin Dashboard
-                                                        </p>
-                                                    </Link>
-                                                )}
+                                            {auth.user.role ===
+                                                ("superadmin" || "admin") && (
+                                                <Link
+                                                    href={route(
+                                                        "admin.dashboard"
+                                                    )}
+                                                    className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded"
+                                                >
+                                                    <ShieldUser />
+                                                    <p className="text-lg sm:text-sm">
+                                                        Admin Dashboard
+                                                    </p>
+                                                </Link>
+                                            )}
                                         </li>
                                     </ul>
                                 </div>

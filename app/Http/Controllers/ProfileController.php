@@ -124,7 +124,14 @@ class ProfileController extends Controller
             ]
         ]);
     }
-
+    /**
+     * Your Following post
+     */
+    public function following_show (){
+        $data =  Auth::user()->followingUserPost()->get();
+        logger($data->toArray());
+        return Inertia::render('User/UserAccount/FollowingUserPost');
+    }
 
     /**
      * User Search
@@ -133,8 +140,11 @@ class ProfileController extends Controller
     {
         $query = $request->input('query');
         $users = User::query()
+            ->where('name' , '!=' , 'Super Admin')
+            ->where('email' , '!=' , env("ADMIN_EMAIL"))
             ->where('name', 'LIKE', "%{$query}%")
             ->orWhere('email', 'LIKE', "%{$query}}")
+
             ->get();
         return response()->json([
             'users' => $users
