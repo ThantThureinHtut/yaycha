@@ -3,9 +3,9 @@ import Header from "@/Components/Header";
 import usePostEcho from "@/Components/Hooks/usePostEcho";
 import { useState } from "react";
 
-export default function FollowingUserPost({ posts: initalPosts }) {
+export default function FollowingUserPost({posts: initalPosts}) {
     const [posts, setPosts] = useState(initalPosts);
-    usePostEcho(setPosts);
+    usePostEcho(setPosts)
     return (
         <div>
             <Header />

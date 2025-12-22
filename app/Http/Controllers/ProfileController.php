@@ -127,12 +127,12 @@ class ProfileController extends Controller
     /**
      * Your Following post
      */
-    public function following_show (){
+    public function following_show()
+    {
         $posts =  Auth::user()->followingUserPost()
-                                ->with('user:id,name,email,avatar_url,username' , 'views' , 'likes' )
+                                ->with('user:id,name,email,username,avatar_url' , 'likes' , 'views')
                                 ->withCount(['likes' , 'views' , 'comments'])
                                 ->get();
-
         $user = User::where('id', Auth::user()->id)->withCount(['followers', 'followings'])->first();
         $user->load([
             'followers',
@@ -140,7 +140,6 @@ class ProfileController extends Controller
             'bluemark',
             'verifiedacountinfo'
         ]);
-        logger($posts->toArray());
         return Inertia::render('User/UserAccount/FollowingUserPost' , ['posts' => $posts , 'auth' => ['user' => $user]]);
     }
 
@@ -151,8 +150,8 @@ class ProfileController extends Controller
     {
         $query = $request->input('query');
         $users = User::query()
-            ->where('name' , '!=' , 'Super Admin')
-            ->where('email' , '!=' , env("ADMIN_EMAIL"))
+            ->where('name', '!=', 'Super Admin')
+            ->where('email', '!=', env("ADMIN_EMAIL"))
             ->where('name', 'LIKE', "%{$query}%")
             ->orWhere('email', 'LIKE', "%{$query}}")
 
